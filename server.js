@@ -51,6 +51,7 @@ io.on('connection', (socket) => {
     const user = users.get(socket.id);
     if (user) {
       if (data.isAcceptingHelp !== undefined) user.isAcceptingHelp = data.isAcceptingHelp;
+      if (data.needsCare !== undefined) user.needsCare = data.needsCare;
       users.set(socket.id, user);
       socket.broadcast.emit('user_updated', user);
     }

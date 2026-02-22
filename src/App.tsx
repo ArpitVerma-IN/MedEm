@@ -72,6 +72,12 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const watchId = useRef<number | null>(null);
 
+  // Keep an active reference of State for Reconnects
+  const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp });
+  useEffect(() => {
+    stateRef.current = { isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp };
+  }, [isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp]);
+
   useEffect(() => {
     // Connect to Socket.IO server (uses local network IP or deployed URL)
     const getBackendUrl = () => {
@@ -115,13 +121,28 @@ function App() {
       });
     });
 
+    // Handle transparent mobile reconnects
+    newSocket.on('connect', () => {
+      const state = stateRef.current;
+      if (state.isJoined && state.myLocation && state.name) {
+        newSocket.emit('join', {
+          name: state.name.trim(),
+          location: state.myLocation,
+          color: state.myColor,
+          userType: state.userType,
+          needsCare: state.needsCare,
+          isAcceptingHelp: state.isAcceptingHelp
+        });
+      }
+    });
+
     return () => {
       newSocket.disconnect();
       if (watchId.current !== null) {
         navigator.geolocation.clearWatch(watchId.current);
       }
     };
-  }, []);
+  }, []); // Empty dependency array ensures we only bind these once
 
   // Check for nearby patients needing care and incoming doctors
   useEffect(() => {
@@ -153,12 +174,12 @@ function App() {
     }
   }, [users, myLocation, isJoined, userType, needsCare]);
 
-  // When doctor toggles accepting help
+  // Sync any dynamic status checks to all other users immediately
   useEffect(() => {
-    if (socket && isJoined && userType === 'Doctor') {
-      socket.emit('update_status', { isAcceptingHelp });
+    if (socket && isJoined) {
+      socket.emit('update_status', { isAcceptingHelp, needsCare });
     }
-  }, [isAcceptingHelp, socket, isJoined, userType]);
+  }, [isAcceptingHelp, needsCare, socket, isJoined]);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
