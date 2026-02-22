@@ -65,16 +65,24 @@ function App() {
   const watchId = useRef<number | null>(null);
 
   useEffect(() => {
-    // Connect to Socket.IO server (uses local or deployed URL)
-    const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-    const newSocket = io(backendUrl);
+    // Connect to Socket.IO server (uses local network IP or deployed URL)
+    const getBackendUrl = () => {
+      if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+      if (window.location.hostname === 'localhost') return 'http://localhost:3001';
+      return `http://${window.location.hostname}:3001`; // Allows local Wi-Fi testing
+    };
+
+    const newSocket = io(getBackendUrl());
     setSocket(newSocket);
 
     newSocket.on('users', (existingUsers: User[]) => {
-      setUsers(new Map(existingUsers.map(u => [u.id, u])));
+      // Filter out self to prevent duplicate marker
+      const filtered = existingUsers.filter(u => u.id !== newSocket.id);
+      setUsers(new Map(filtered.map(u => [u.id, u])));
     });
 
     newSocket.on('user_joined', (user: User) => {
+      if (user.id === newSocket.id) return;
       setUsers(prev => {
         const next = new Map(prev);
         next.set(user.id, user);
@@ -83,6 +91,7 @@ function App() {
     });
 
     newSocket.on('user_location_updated', (user: User) => {
+      if (user.id === newSocket.id) return;
       setUsers(prev => {
         const next = new Map(prev);
         next.set(user.id, user);
