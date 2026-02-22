@@ -6,6 +6,19 @@ This application pairs **HTML5 Geolocation** directly with extremely low-latency
 
 ---
 
+## 🚑 How It Works: Emergency Proximity Alerts
+
+This prototype includes specialized logic to simulate a medical emergency broadcast system:
+1. **Role Selection**: Upon joining, users can identify themselves as a **Patient** or a **Doctor**.
+2. **Medical Care Request**: Patients are given a dynamic checkbox to indicate if they actively **"need medical care!"**.
+3. **500-Meter Geofence**: The application continuously runs a background algorithm (using Haversine logic via Leaflet) for all logged-in Doctors. It calculates the live distance between the Doctor and any Patient currently requesting help.
+4. **Real-Time UI Alerts**: If a Patient needing medical care physically comes within **500 meters** of a Doctor, the Doctor's interface will immediately trigger an emergency state:
+    - A critical red banner drops into the UI showing the active count of nearby patients.
+    - The Patient's live marker pin on the map turns bright red, glows, and actively flickers to draw immediate attention.
+5. **Core Stability**: If a Patient does not request medical care, or is outside the 500m radius, their location updates simply blend into the standard UI app flow without disturbing the dashboard.
+
+---
+
 ## 🚀 Tech Stack
 
 - **Frontend Framework:** React 19 + TypeScript powered by Vite
