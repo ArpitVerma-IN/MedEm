@@ -25,12 +25,14 @@ io.on('connection', (socket) => {
       id: socket.id,
       name: data.name,
       location: data.location,
-      color: data.color
+      color: data.color,
+      userType: data.userType,
+      needsCare: data.needsCare
     });
-    
+
     // Send all existing users to the new user
     socket.emit('users', Array.from(users.values()));
-    
+
     // Broadcast the new user to everyone else
     socket.broadcast.emit('user_joined', users.get(socket.id));
   });
