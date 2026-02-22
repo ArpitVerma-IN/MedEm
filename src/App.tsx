@@ -33,6 +33,7 @@ interface User {
   userType: 'Doctor' | 'Patient';
   needsCare: boolean;
   isAcceptingHelp?: boolean;
+  acceptingPatientId?: string | null;
 }
 
 // Generate random colors for users
@@ -63,8 +64,9 @@ function App() {
   const [userType, setUserType] = useState<'Doctor' | 'Patient'>('Patient');
   const [needsCare, setNeedsCare] = useState(false);
   const [isAcceptingHelp, setIsAcceptingHelp] = useState(false);
-  const [alertPatients, setAlertPatients] = useState<User[]>([]);
-  const [incomingDoctors, setIncomingDoctors] = useState<User[]>([]);
+  const [acceptingPatientId, setAcceptingPatientId] = useState<string | null>(null);
+  const [nearbyPatients, setNearbyPatients] = useState<{ user: User, distance: number }[]>([]);
+  const [incomingDoctors, setIncomingDoctors] = useState<{ user: User, distance: number }[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const [myLocation, setMyLocation] = useState<Location | null>(null);
   const [users, setUsers] = useState<Map<string, User>>(new Map());
@@ -73,10 +75,10 @@ function App() {
   const watchId = useRef<number | null>(null);
 
   // Keep an active reference of State for Reconnects
-  const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp });
+  const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId });
   useEffect(() => {
-    stateRef.current = { isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp };
-  }, [isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp]);
+    stateRef.current = { isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId };
+  }, [isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId]);
 
   useEffect(() => {
     // Connect to Socket.IO server (uses local network IP or deployed URL)
@@ -131,7 +133,8 @@ function App() {
           color: state.myColor,
           userType: state.userType,
           needsCare: state.needsCare,
-          isAcceptingHelp: state.isAcceptingHelp
+          isAcceptingHelp: state.isAcceptingHelp,
+          acceptingPatientId: state.acceptingPatientId
         });
       }
     });
@@ -150,36 +153,45 @@ function App() {
     const myLatLng = L.latLng(myLocation.lat, myLocation.lng);
 
     if (userType === 'Doctor') {
-      const nearby: User[] = [];
+      const nearby: { user: User, distance: number }[] = [];
       Array.from(users.values()).forEach(user => {
         if (user.userType === 'Patient' && user.needsCare && user.location) {
           const userLatLng = L.latLng(user.location.lat, user.location.lng);
           const distance = myLatLng.distanceTo(userLatLng);
-          if (distance <= 500) nearby.push(user);
+          if (distance <= 500) nearby.push({ user, distance });
         }
       });
-      setAlertPatients(nearby);
+      setNearbyPatients(nearby);
       setIncomingDoctors([]); // clear the other type
+
+      // Auto-clear accepting status if patient drops off map or clears care status
+      if (acceptingPatientId && !nearby.find(p => p.user.id === acceptingPatientId)) {
+        setAcceptingPatientId(null);
+        setIsAcceptingHelp(false);
+      }
     } else if (userType === 'Patient' && needsCare) {
-      const doctors: User[] = [];
+      const doctors: { user: User, distance: number }[] = [];
       Array.from(users.values()).forEach(user => {
-        if (user.userType === 'Doctor' && user.isAcceptingHelp && user.location) {
+        if (user.userType === 'Doctor' && user.acceptingPatientId === socket?.id && user.location) {
           const userLatLng = L.latLng(user.location.lat, user.location.lng);
           const distance = myLatLng.distanceTo(userLatLng);
-          if (distance <= 500) doctors.push(user);
+          doctors.push({ user, distance });
         }
       });
       setIncomingDoctors(doctors);
-      setAlertPatients([]); // clear the other type
+      setNearbyPatients([]); // clear the other type
     }
-  }, [users, myLocation, isJoined, userType, needsCare]);
+  }, [users, myLocation, isJoined, userType, needsCare, acceptingPatientId, socket]);
 
   // Sync any dynamic status checks to all other users immediately
   useEffect(() => {
     if (socket && isJoined) {
-      socket.emit('update_status', { isAcceptingHelp, needsCare });
+      socket.emit('update_status', { isAcceptingHelp, needsCare, acceptingPatientId });
     }
-  }, [isAcceptingHelp, needsCare, socket, isJoined]);
+  }, [isAcceptingHelp, needsCare, acceptingPatientId, socket, isJoined]);
+
+  // Utility to format distance
+  const formatDist = (m: number) => m > 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,7 +213,7 @@ function App() {
         setIsJoined(true);
 
         if (socket) {
-          socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare, isAcceptingHelp });
+          socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId });
 
           // Start watching position
           watchId.current = navigator.geolocation.watchPosition(
@@ -320,32 +332,61 @@ function App() {
         </div>
 
         <div className="glass-panel users-panel">
-          {alertPatients.length > 0 && userType === 'Doctor' && (
+          {nearbyPatients.length > 0 && userType === 'Doctor' && (
             <div style={{ background: 'rgba(239, 68, 68, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--danger)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <AlertTriangle color="var(--danger)" size={20} style={{ flexShrink: 0 }} />
                 <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
-                  {alertPatients.length} patient(s) need medical care nearby!
+                  {nearbyPatients.length} patient(s) need medical care nearby!
                 </span>
               </div>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem', color: 'white', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px' }}>
-                <input
-                  type="checkbox"
-                  checked={isAcceptingHelp}
-                  onChange={(e) => setIsAcceptingHelp(e.target.checked)}
-                  style={{ accentColor: 'var(--success)', width: '16px', height: '16px' }}
-                />
-                I am accepting to help
-              </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
+                <select
+                  className="text-input"
+                  style={{ padding: '8px', fontSize: '0.85rem', background: 'rgba(0,0,0,0.3)', cursor: 'pointer' }}
+                  value={acceptingPatientId || ''}
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    if (selected) {
+                      setAcceptingPatientId(selected);
+                      setIsAcceptingHelp(true);
+                    } else {
+                      setAcceptingPatientId(null);
+                      setIsAcceptingHelp(false);
+                    }
+                  }}
+                >
+                  <option value="">Select patient to help...</option>
+                  {nearbyPatients.map(p => (
+                    <option key={p.user.id} value={p.user.id}>
+                      {p.user.name} ({formatDist(p.distance)} away)
+                    </option>
+                  ))}
+                </select>
+                {acceptingPatientId && nearbyPatients.find(p => p.user.id === acceptingPatientId) && (
+                  <span style={{ fontSize: '0.8rem', color: 'var(--success)', fontWeight: 600, display: 'block', textAlign: 'center', marginTop: '4px' }}>
+                    Active Rescue: Approaching in {formatDist(nearbyPatients.find(p => p.user.id === acceptingPatientId)!.distance)}
+                  </span>
+                )}
+              </div>
             </div>
           )}
 
           {incomingDoctors.length > 0 && userType === 'Patient' && (
-            <div style={{ background: 'rgba(16, 185, 129, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--success)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Navigation color="var(--success)" size={20} style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
-                {incomingDoctors.length} Doctor(s) are on the way!
-              </span>
+            <div style={{ background: 'rgba(16, 185, 129, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--success)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Navigation color="var(--success)" size={20} style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
+                  A Doctor is on the way!
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {incomingDoctors.map(d => (
+                  <span key={d.user.id} style={{ fontSize: '0.85rem', color: 'white', fontWeight: 600, marginLeft: '28px' }}>
+                    Dr. {d.user.name} is {formatDist(d.distance)} away
+                  </span>
+                ))}
+              </div>
             </div>
           )}
           <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -420,24 +461,30 @@ function App() {
             if (!user.location || !user.location.lat || !user.location.lng) return null;
 
             if (userType === 'Patient' && user.userType === 'Doctor') {
-              const isIncoming = incomingDoctors.some(d => d.id === user.id);
+              const isIncoming = incomingDoctors.some(d => d.user.id === user.id);
               if (!isIncoming) return null; // hide doctor's location
             }
 
             let isFlickering = false;
+            let distanceStr = '';
+
             if (userType === 'Doctor') {
-              isFlickering = alertPatients.some(p => p.id === user.id);
+              const match = nearbyPatients.find(p => p.user.id === user.id);
+              if (match) {
+                isFlickering = true;
+                distanceStr = ` (${formatDist(match.distance)})`;
+              }
             }
 
             return (
               <Marker
                 key={user.id}
                 position={[user.location.lat, user.location.lng]}
-                icon={createCustomIcon(user.color, user.name.charAt(0).toUpperCase(), isFlickering)}
+                icon={createCustomIcon(user.color, user.name.charAt(0).toUpperCase(), isFlickering && (acceptingPatientId === null || acceptingPatientId === user.id))}
               >
                 <Popup>
-                  <strong>{user.name} ({user.userType})</strong><br />
-                  {user.needsCare ? "Needs Medical Care!" : (user.isAcceptingHelp ? "On the way to help" : "User's location")}
+                  <strong>{user.name} ({user.userType}){distanceStr}</strong><br />
+                  {user.needsCare ? "Needs Medical Care!" : (user.isAcceptingHelp && user.userType === 'Doctor' ? "On the way to help" : "User's location")}
                 </Popup>
               </Marker>
             );

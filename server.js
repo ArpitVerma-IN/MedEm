@@ -28,7 +28,8 @@ io.on('connection', (socket) => {
       color: data.color,
       userType: data.userType,
       needsCare: data.needsCare,
-      isAcceptingHelp: data.isAcceptingHelp || false
+      isAcceptingHelp: data.isAcceptingHelp || false,
+      acceptingPatientId: data.acceptingPatientId || null
     });
 
     // Send all existing users to the new user
@@ -52,6 +53,7 @@ io.on('connection', (socket) => {
     if (user) {
       if (data.isAcceptingHelp !== undefined) user.isAcceptingHelp = data.isAcceptingHelp;
       if (data.needsCare !== undefined) user.needsCare = data.needsCare;
+      if (data.acceptingPatientId !== undefined) user.acceptingPatientId = data.acceptingPatientId;
       users.set(socket.id, user);
       socket.broadcast.emit('user_updated', user);
     }
