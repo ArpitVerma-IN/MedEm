@@ -254,7 +254,7 @@ function App() {
             </div>
           </div>
           <div className="title-container">
-            <h1 className="modal-title">Live Tracker</h1>
+            <h1 className="modal-title">MedEm</h1>
             <p className="modal-desc">Enter your name to share your location and see others.</p>
           </div>
 
@@ -326,8 +326,8 @@ function App() {
             <Navigation size={20} color="white" />
           </div>
           <div className="title-container">
-            <h1 className="app-title">Live Tracker</h1>
-            <span className="app-subtitle">Real-time Location</span>
+            <h1 className="app-title">MedEm</h1>
+            <span className="app-subtitle">Emergency Responder</span>
           </div>
         </div>
 
