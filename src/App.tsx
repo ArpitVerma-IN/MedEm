@@ -32,6 +32,7 @@ interface User {
   color: string;
   userType: 'Doctor' | 'Patient';
   needsCare: boolean;
+  isAcceptingHelp?: boolean;
 }
 
 // Generate random colors for users
@@ -61,7 +62,9 @@ function App() {
   const [name, setName] = useState('');
   const [userType, setUserType] = useState<'Doctor' | 'Patient'>('Patient');
   const [needsCare, setNeedsCare] = useState(false);
+  const [isAcceptingHelp, setIsAcceptingHelp] = useState(false);
   const [alertPatients, setAlertPatients] = useState<User[]>([]);
+  const [incomingDoctors, setIncomingDoctors] = useState<User[]>([]);
   const [isJoined, setIsJoined] = useState(false);
   const [myLocation, setMyLocation] = useState<Location | null>(null);
   const [users, setUsers] = useState<Map<string, User>>(new Map());
@@ -95,7 +98,7 @@ function App() {
       });
     });
 
-    newSocket.on('user_location_updated', (user: User) => {
+    newSocket.on('user_updated', (user: User) => {
       if (user.id === newSocket.id) return;
       setUsers(prev => {
         const next = new Map(prev);
@@ -120,26 +123,42 @@ function App() {
     };
   }, []);
 
-  // Check for nearby patients needing care
+  // Check for nearby patients needing care and incoming doctors
   useEffect(() => {
-    if (isJoined && userType === 'Doctor' && myLocation) {
-      const nearby: User[] = [];
-      const myLatLng = L.latLng(myLocation.lat, myLocation.lng);
+    if (!isJoined || !myLocation) return;
+    const myLatLng = L.latLng(myLocation.lat, myLocation.lng);
 
+    if (userType === 'Doctor') {
+      const nearby: User[] = [];
       Array.from(users.values()).forEach(user => {
         if (user.userType === 'Patient' && user.needsCare && user.location) {
           const userLatLng = L.latLng(user.location.lat, user.location.lng);
           const distance = myLatLng.distanceTo(userLatLng);
-          if (distance <= 500) {
-            nearby.push(user);
-          }
+          if (distance <= 500) nearby.push(user);
         }
       });
       setAlertPatients(nearby);
-    } else {
-      setAlertPatients([]);
+      setIncomingDoctors([]); // clear the other type
+    } else if (userType === 'Patient' && needsCare) {
+      const doctors: User[] = [];
+      Array.from(users.values()).forEach(user => {
+        if (user.userType === 'Doctor' && user.isAcceptingHelp && user.location) {
+          const userLatLng = L.latLng(user.location.lat, user.location.lng);
+          const distance = myLatLng.distanceTo(userLatLng);
+          if (distance <= 500) doctors.push(user);
+        }
+      });
+      setIncomingDoctors(doctors);
+      setAlertPatients([]); // clear the other type
     }
-  }, [users, myLocation, isJoined, userType]);
+  }, [users, myLocation, isJoined, userType, needsCare]);
+
+  // When doctor toggles accepting help
+  useEffect(() => {
+    if (socket && isJoined && userType === 'Doctor') {
+      socket.emit('update_status', { isAcceptingHelp });
+    }
+  }, [isAcceptingHelp, socket, isJoined, userType]);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,7 +180,7 @@ function App() {
         setIsJoined(true);
 
         if (socket) {
-          socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare });
+          socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare, isAcceptingHelp });
 
           // Start watching position
           watchId.current = navigator.geolocation.watchPosition(
@@ -174,7 +193,7 @@ function App() {
               socket.emit('update_location', { location: newLocation });
             },
             (err) => console.error(err),
-            { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
           );
         }
       },
@@ -268,7 +287,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <div className="floating-header">
+      <div className="ui-section">
         <div className="glass-panel header-content">
           <div className="logo-icon">
             <Navigation size={20} color="white" />
@@ -280,11 +299,31 @@ function App() {
         </div>
 
         <div className="glass-panel users-panel">
-          {alertPatients.length > 0 && (
-            <div style={{ background: 'rgba(239, 68, 68, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--danger)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AlertTriangle color="var(--danger)" size={20} style={{ flexShrink: 0 }} />
+          {alertPatients.length > 0 && userType === 'Doctor' && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--danger)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertTriangle color="var(--danger)" size={20} style={{ flexShrink: 0 }} />
+                <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
+                  {alertPatients.length} patient(s) need medical care nearby!
+                </span>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem', color: 'white', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '8px' }}>
+                <input
+                  type="checkbox"
+                  checked={isAcceptingHelp}
+                  onChange={(e) => setIsAcceptingHelp(e.target.checked)}
+                  style={{ accentColor: 'var(--success)', width: '16px', height: '16px' }}
+                />
+                I am accepting to help
+              </label>
+            </div>
+          )}
+
+          {incomingDoctors.length > 0 && userType === 'Patient' && (
+            <div style={{ background: 'rgba(16, 185, 129, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--success)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Navigation color="var(--success)" size={20} style={{ flexShrink: 0 }} />
               <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
-                {alertPatients.length} patient(s) need medical care nearby!
+                {incomingDoctors.length} Doctor(s) are on the way!
               </span>
             </div>
           )}
@@ -328,54 +367,62 @@ function App() {
         </div>
       </div>
 
-      <MapContainer
-        center={defaultCenter}
-        zoom={15}
-        zoomControl={false}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-        />
+      <div className="map-section">
+        <MapContainer
+          center={defaultCenter}
+          zoom={15}
+          zoomControl={false}
+          style={{ height: '100%', width: '100%', zIndex: 1 }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          />
 
-        {myLocation && <MapController center={[myLocation.lat, myLocation.lng]} />}
+          {myLocation && <MapController center={[myLocation.lat, myLocation.lng]} />}
 
-        {/* My Marker */}
-        {myLocation && (
-          <Marker
-            position={[myLocation.lat, myLocation.lng]}
-            icon={createCustomIcon(myColor, name.charAt(0).toUpperCase())}
-          >
-            <Popup>
-              <strong>{name} ({userType} - You)</strong><br />
-              {needsCare ? "Needs Medical Care!" : "Current location"}
-            </Popup>
-          </Marker>
-        )}
-
-        {/* Other Users' Markers */}
-        {Array.from(users.values()).map(user => {
-          if (!user.location || !user.location.lat || !user.location.lng) return null;
-
-          let isFlickering = false;
-          if (userType === 'Doctor') {
-            isFlickering = alertPatients.some(p => p.id === user.id);
-          }
-
-          return (
+          {/* My Marker */}
+          {myLocation && (
             <Marker
-              key={user.id}
-              position={[user.location.lat, user.location.lng]}
-              icon={createCustomIcon(user.color, user.name.charAt(0).toUpperCase(), isFlickering)}
+              position={[myLocation.lat, myLocation.lng]}
+              icon={createCustomIcon(myColor, name.charAt(0).toUpperCase())}
             >
               <Popup>
-                <strong>{user.name} ({user.userType})</strong><br />
-                {user.needsCare ? "Needs Medical Care!" : "User's location"}
+                <strong>{name} ({userType} - You)</strong><br />
+                {needsCare ? "Needs Medical Care!" : "Current location"}
               </Popup>
             </Marker>
-          );
-        })}
-      </MapContainer>
+          )}
+
+          {/* Other Users' Markers */}
+          {Array.from(users.values()).map(user => {
+            if (!user.location || !user.location.lat || !user.location.lng) return null;
+
+            if (userType === 'Patient' && user.userType === 'Doctor') {
+              const isIncoming = incomingDoctors.some(d => d.id === user.id);
+              if (!isIncoming) return null; // hide doctor's location
+            }
+
+            let isFlickering = false;
+            if (userType === 'Doctor') {
+              isFlickering = alertPatients.some(p => p.id === user.id);
+            }
+
+            return (
+              <Marker
+                key={user.id}
+                position={[user.location.lat, user.location.lng]}
+                icon={createCustomIcon(user.color, user.name.charAt(0).toUpperCase(), isFlickering)}
+              >
+                <Popup>
+                  <strong>{user.name} ({user.userType})</strong><br />
+                  {user.needsCare ? "Needs Medical Care!" : (user.isAcceptingHelp ? "On the way to help" : "User's location")}
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
+      </div>
     </div>
   );
 }

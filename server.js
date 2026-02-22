@@ -27,7 +27,8 @@ io.on('connection', (socket) => {
       location: data.location,
       color: data.color,
       userType: data.userType,
-      needsCare: data.needsCare
+      needsCare: data.needsCare,
+      isAcceptingHelp: data.isAcceptingHelp || false
     });
 
     // Send all existing users to the new user
@@ -42,7 +43,16 @@ io.on('connection', (socket) => {
     if (user) {
       user.location = data.location;
       users.set(socket.id, user);
-      socket.broadcast.emit('user_location_updated', user);
+      socket.broadcast.emit('user_updated', user);
+    }
+  });
+
+  socket.on('update_status', (data) => {
+    const user = users.get(socket.id);
+    if (user) {
+      if (data.isAcceptingHelp !== undefined) user.isAcceptingHelp = data.isAcceptingHelp;
+      users.set(socket.id, user);
+      socket.broadcast.emit('user_updated', user);
     }
   });
 

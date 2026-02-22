@@ -53,21 +53,52 @@ body {
 }
 
 .app-container {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   width: 100%;
 }
 
-.floating-header {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  right: 24px;
-  z-index: 1000;
+.ui-section {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  pointer-events: none;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  z-index: 1000;
+  background: var(--bg-color);
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.map-section {
+  flex: 1;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    display: block;
+  }
+
+  .ui-section {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    right: 24px;
+    padding: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: transparent;
+    pointer-events: none;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .map-section {
+    height: 100%;
+    width: 100%;
+  }
 }
 
 .header-content {
