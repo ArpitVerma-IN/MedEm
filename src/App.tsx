@@ -293,20 +293,8 @@ function App() {
               </label>
             </div>
 
-            {userType === 'Patient' && (
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', justifyContent: 'center', color: 'var(--danger)', fontWeight: 500, marginTop: '8px' }}>
-                <input
-                  type="checkbox"
-                  checked={needsCare}
-                  onChange={(e) => setNeedsCare(e.target.checked)}
-                  style={{ accentColor: 'var(--danger)', width: '18px', height: '18px' }}
-                />
-                I need medical care!
-              </label>
-            )}
-
             {error && <p style={{ color: 'var(--danger)', fontSize: '0.875rem' }}>{error}</p>}
-            <button type="submit" className="primary-btn" disabled={!name.trim()}>
+            <button type="submit" className="primary-btn" style={{ marginTop: '16px' }} disabled={!name.trim()}>
               Join Tracker
             </button>
           </form>
@@ -332,6 +320,20 @@ function App() {
         </div>
 
         <div className="glass-panel users-panel">
+          {userType === 'Patient' && (
+            <div style={{ background: 'rgba(239, 68, 68, 0.15)', padding: '12px', borderRadius: '8px', border: '1px solid var(--danger)', display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: 'var(--danger)', fontWeight: 600 }}>
+                <input
+                  type="checkbox"
+                  checked={needsCare}
+                  onChange={(e) => setNeedsCare(e.target.checked)}
+                  style={{ accentColor: 'var(--danger)', width: '18px', height: '18px' }}
+                />
+                I need medical care!
+              </label>
+            </div>
+          )}
+
           {nearbyPatients.length > 0 && userType === 'Doctor' && (
             <div style={{ background: 'rgba(239, 68, 68, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--danger)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
