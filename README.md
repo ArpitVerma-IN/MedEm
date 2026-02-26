@@ -90,3 +90,48 @@ If you simply wish to clone and test this locally between an iPhone and your Lap
 
 3. Find your PC's IP address (e.g., `192.168.1.5`).
 4. On your mobile phone, open Safari/Chrome to `http://192.168.1.5:5173`. 
+
+---
+
+## 🔮 Further Updates & Roadmap
+
+To evolve this prototype into a full-fledged, production-ready healthcare application, the following updates have been divided into architectural phases. This layered approach ensures that new features integrate seamlessly with previous updates without requiring major codebase rewrites.
+
+### Phase 1: Native Mobile Experience & Design
+**Focus:** Enhancing the core User Interface (UI) and User Experience (UX), particularly for mobile devices.
+- **Separate Portals:** Create distinctly generalized, separate app screens tailored specifically for the intuitive needs of **Patients** and **Doctors**.
+- **Interactive UI:** Implement a modern, dynamic, and highly interactive application design philosophy prioritizing ease of use during high-stress scenarios.
+- **Tech Stack:** 
+  [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#) [![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](#)
+
+### Phase 2: Authentication & Secure Infrastructure
+**Focus:** Implementing a robust, secure data foundation and user login system.
+- **Secure Login:** Integration of secure login for doctors and patients using either native credentials (ID/Password) or secure OAuth providers (Google, etc.).
+- **Dual-Database Architecture:** Segregation of data. Utilize a dedicated authentication provider for login credentials, and a separate, secure, free NoSQL/SQL database for storing private user app data (ensuring strict data safety mimicking Render/Netlify's ease of deployment).
+- **Security-First:** Embed secure design philosophies (e.g., JWT rotation, strict CORS, rate limiting) directly into the API architecture.
+- **Tech Stack:** 
+  [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](#) [![Google OAuth](https://img.shields.io/badge/Google_OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white)](#) [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](#)
+
+### Phase 3: AI Verification & Medical Records Management
+**Focus:** Elevating trust, safety, and operational efficiency using artificial intelligence.
+- **Doctor Verification:** Systematically collect and verify legitimate doctor details, medical certificates, and other legal documentation.
+- **AI Authentication:** Use advanced AI models to authenticate and validate uploaded patient/doctor documentation securely and seamlessly.
+- **Smart Patient History:** Retrieve authentic past medical records and use modern APIs (like Google Gemini) to generate instantaneous, easy-to-read emergency summaries for incoming doctors.
+- **Tech Stack:** 
+  [![Google Gemini](https://img.shields.io/badge/Google_Gemini-8E75B2?style=for-the-badge&logo=googlebard&logoColor=white)](#) [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](#) [![Tesseract OCR](https://img.shields.io/badge/Tesseract_OCR-000000?style=for-the-badge&logo=tesseract&logoColor=white)](#)
+
+### Phase 4: Data Privacy & Account Lifecycle
+**Focus:** Giving users total control over their data footprint in compliance with modern privacy standards.
+- **Account Deletion:** Provide a seamless ability within the app interface for users to permanently delete their account, details, and location data from the server based on user requests.
+- **Abuse Prevention Retention:** Soft-retain a minimal record (like an obscured hash of an email) post-deletion. This allows the system to inform the user if they attempt to reuse the exact same credentials to exploit new-user promotions in the future.
+- **Tech Stack:** 
+  [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](#) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#) 
+
+### 📋 Roadmap Summary
+
+| Phase | Title | Brief Summary |
+|-------|-------|---------------|
+| **1** | **Native UI/UX** | Split Doctor/Patient portals with a modernized, mobile-first interactive design. |
+| **2** | **Secure Data Layer** | Implement OAuth logins, secure isolated databases, and hardened API architecture. |
+| **3** | **AI Integration** | Automate credential verification and generate critical emergency AI patient summaries. |
+| **4** | **Privacy Controls** | Develop self-service account deletion systems with integrated backend abuse protection. |

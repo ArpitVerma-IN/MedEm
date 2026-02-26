@@ -1,0 +1,79 @@
+MedEm - Future Development Strategy & Implementation Guide
+==========================================================
+
+This document outlines the step-by-step developer roadmap to transition the MedEm live-tracking prototype into a production-ready, secure, and AI-powered medical application.
+
+----------------------------------------------------------
+PHASE 1: Native Mobile Experience & Design
+----------------------------------------------------------
+Goal: Overhaul the frontend architecture to support distinct, professional interfaces for Doctors and Patients.
+
+Step 1: Setup Routing
+- Install `react-router-dom`.
+- Create a generalized landing page (`/`) with two distinct entry points: "I am a Patient" and "I am a Doctor".
+
+Step 2: Component Segregation
+- Move current map logic into a reusable `<LiveTrackingMap />` component.
+- Create `/patient/dashboard` and `/doctor/dashboard` directory structures.
+- Tailor the floating UI overlays specifically for each role (e.g., Doctors get triage queues and proximity lists; Patients get simple SOS tracking screens).
+
+Step 3: UI/UX Overhaul
+- Integrate Tailwind CSS for scalable styling to replace hardcoded vanilla CSS.
+- Implement highly interactive motion libraries (like Framer Motion) for smooth bottom-sheet modals on mobile.
+- Ensure strict mobile-first responsive framing (prevent map scroll hijacking natively).
+
+----------------------------------------------------------
+PHASE 2: Authentication & Secure Infrastructure
+----------------------------------------------------------
+Goal: Implement persistent accounts and move away from ephemeral local state.
+
+Step 1: Select Backend-as-a-Service (BaaS)
+- Create a Supabase (or Firebase) project. This satisfies the requirement for a strong, secure, free, and easy-to-use database mimicking the deploy complexity of Render/Netlify.
+
+Step 2: Implement Authentication
+- Configure Google OAuth and Email/Password auth providers in your BaaS.
+- Update the React App to require full Authentication before establishing a Socket.IO connection.
+- Pass the authenticated User ID (UUID) into the Socket `join` event to securely track users across hard browser refreshes.
+
+Step 3: Dual-Database Architecture Setup
+- Use the BaaS native "Auth" tables solely for secure credential management.
+- Create separate, secure NoSQL (MongoDB Atlas) or SQL tables (Supabase PostgreSQL) specifically for User App Data (Profiles, Names, Certifications).
+- Enforce strict Row Level Security (RLS) policies so patients can only read their own data, and verified doctors are the only ones permitted to read emergency data streams.
+
+----------------------------------------------------------
+PHASE 3: AI Verification & Medical Records Management
+----------------------------------------------------------
+Goal: Establish trust through identity verification and summarize complex health data using AI.
+
+Step 1: Document Upload & Storage
+- Integrate cloud storage buckets (e.g., Supabase Storage) allowing doctors to securely upload JPEGs/PDFs of their academic/medical certificates.
+
+Step 2: AI Verification Process
+- Set up a secure Node.js backend route.
+- Pipe incoming doctor certificate bytes into an AI vision model (e.g., Google Gemini Pro Vision API).
+- Prompt the API to automatically extract text, verify standard medical licensing formats, and flag forged documents.
+- Automatically update the Doctor's database profile flag to `isVerified: true` once cleared.
+
+Step 3: Patient Medical Summaries
+- Build an onboarding flow allowing patients to fill out medical histories (allergies, past surgeries, active medications) into the secure database.
+- When an emergency triggers, fetch the raw patient profile database row.
+- Send this JSON payload to the Gemini API with a prompt: "Summarize this medical history into a highly legible, 3-bullet-point emergency briefing for an incoming paramedic."
+- Display this AI-generated summary directly on the Doctor's frontend tracking dashboard to assist upon arrival.
+
+----------------------------------------------------------
+PHASE 4: Data Privacy & Account Lifecycle
+----------------------------------------------------------
+Goal: Comply with data deletion requests while inherently preventing system promotion abuse.
+
+Step 1: Account Deletion UI
+- Add a dedicated "Delete Account" button within the app interface configurations.
+- Require users to type a confirmation word or enter a final One-Time Password to proceed.
+
+Step 2: Backend Deletion Logic
+- Create a protected `/api/delete-account` endpoint on your Express server.
+- Upon trigger, securely wipe all identifiable rows referencing the user from your primary database tables (location history, medical records, profile tags).
+
+Step 3: Abuse Prevention Retention
+- Before permanently deleting the user's root Auth credential record, compute a one-way secure hash (like SHA-256) of their connected email address.
+- Store this mathematically irreversible hash string in a lightweight `deleted_accounts_log` table.
+- If a user attempts to create a completely new account with the exact same email hoping to claim "new user" promotional benefits, run their new entry through the same hash. If it matches a record in the log table, gracefully show a UI alert indicating they are a returned user and restrict promotion application.
