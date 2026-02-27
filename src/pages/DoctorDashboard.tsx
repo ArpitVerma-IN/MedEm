@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Navigation, Locate, AlertTriangle } from 'lucide-react';
+import { Locate, AlertTriangle, Activity } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
 import { useLiveTracker } from '../hooks/useLiveTracker';
 import { LiveTrackingMap } from '../components/LiveTrackingMap';
 
-
-const colors = ['#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'];
+const colors = ['#059669', '#10B981', '#34D399', '#047857'];
 const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
 
 export const DoctorDashboard = () => {
@@ -56,114 +57,137 @@ export const DoctorDashboard = () => {
     };
 
     if (!isJoined && !error) {
-        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'white' }}>Connecting to emergency network...</div>;
+        return <div className="flex justify-center items-center h-screen w-screen bg-slate-900 text-white font-medium tracking-wide">Connecting to emergency network...</div>;
     }
 
     if (error) {
         return (
-            <div className="modal-overlay">
-                <div className="glass-panel modal-content">
-                    <h2 className="modal-title" style={{ color: 'var(--danger)' }}>Connection Error</h2>
-                    <p>{error}</p>
-                    <button className="primary-btn" style={{ marginTop: '16px' }} onClick={() => navigate('/')}>Go Back</button>
+            <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
+                <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[24px] p-8 shadow-2xl border border-white/10 text-center">
+                    <h2 className="text-2xl font-bold text-danger-DEFAULT mb-2">Connection Error</h2>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6 font-medium">{error}</p>
+                    <button className="w-full bg-danger-DEFAULT hover:bg-danger-dark text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98]" onClick={() => navigate('/')}>
+                        Go Back
+                    </button>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="app-container">
-            <div className="ui-section">
-                <div className="glass-panel header-content">
-                    <div className="logo-icon">
-                        <Navigation size={20} color="white" />
-                    </div>
-                    <div className="title-container">
-                        <h1 className="app-title">Doctor Portal</h1>
-                        <span className="app-subtitle">Active Responder Queue</span>
+        <div className="flex flex-col h-[100dvh] w-full bg-[#064E3B] dark:bg-[#022C22] overflow-hidden font-inter">
+            {/* Top Branded Section - Emerald/Teal Theme for Doctors */}
+            <div className="w-full pt-12 pb-16 px-6 flex flex-col text-white z-0 relative">
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                    <span className="text-xs font-bold opacity-80 tracking-widest uppercase text-emerald-100">Responder Active</span>
+                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm border border-white/10 shadow-sm">
+                        <span className="text-white text-xs font-black leading-none">DR</span>
                     </div>
                 </div>
 
-                <div className="glass-panel users-panel">
-                    {nearbyPatients.length > 0 && (
-                        <div style={{ background: 'rgba(239, 68, 68, 0.2)', padding: '12px', borderRadius: '8px', border: '1px solid var(--danger)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <AlertTriangle color="var(--danger)" size={20} style={{ flexShrink: 0 }} />
-                                <span style={{ fontSize: '0.85rem', color: 'white', fontWeight: 500 }}>
-                                    {nearbyPatients.length} emergency patient(s) nearby
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
-                                <select
-                                    className="text-input"
-                                    style={{ padding: '8px', fontSize: '0.85rem', background: 'rgba(0,0,0,0.3)', cursor: 'pointer' }}
-                                    value={acceptingPatientId || ''}
-                                    onChange={(e) => {
-                                        const selected = e.target.value;
-                                        if (selected) {
-                                            setAcceptingPatientId(selected);
-                                            setIsAcceptingHelp(true);
-                                        } else {
-                                            setAcceptingPatientId(null);
-                                            setIsAcceptingHelp(false);
-                                        }
-                                    }}
-                                >
-                                    <option value="">Select patient to trace & respond...</option>
-                                    {nearbyPatients.map(p => (
-                                        <option key={p.user.id} value={p.user.id}>
-                                            {p.user.name} ({formatDist(p.distance)} away)
-                                        </option>
-                                    ))}
-                                </select>
-                                {acceptingPatientId && nearbyPatients.find(p => p.user.id === acceptingPatientId) && (
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--success)', fontWeight: 600, display: 'block', textAlign: 'center', marginTop: '4px' }}>
-                                        Tracking Approach Distance: {formatDist(nearbyPatients.find(p => p.user.id === acceptingPatientId)!.distance)}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    )}
+                <h1 className="text-3xl font-extrabold tracking-tight mb-1 relative z-10 drop-shadow-sm">Dr. {name}</h1>
+                <p className="text-emerald-100/90 font-medium text-[1.05rem] max-w-[260px] leading-relaxed relative z-10">
+                    Standing by for emergency tracking signals.
+                </p>
 
-                    <h3 style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Active Tracker List ({users.size + 1})
-                    </h3>
-                    <div className="users-list">
-                        <div className="user-item">
-                            <div className="user-avatar" style={{ backgroundColor: myColor }}>{name.charAt(0).toUpperCase()}</div>
-                            <div className="user-info">
-                                <span className="user-name">Dr. {name} (You)</span>
-                                <span className="user-status"><span className="status-dot"></span> Available Responder</span>
-                            </div>
-                            <button
-                                onClick={centerMapToMe}
-                                style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: '4px' }}
-                            ><Locate size={18} /></button>
-                        </div>
-                        {Array.from(users.values()).map(user => (
-                            <div className="user-item" key={user.id}>
-                                <div className="user-avatar" style={{ backgroundColor: user.color }}>{user.name.charAt(0).toUpperCase()}</div>
-                                <div className="user-info">
-                                    <span className="user-name">{user.userType === 'Doctor' ? `Dr. ${user.name}` : user.name} ({user.userType})</span>
-                                    <span className="user-status"><span className="status-dot" style={user.needsCare ? { background: 'var(--danger)' } : {}}></span> {user.needsCare ? "CRITICAL CARE" : "Online"}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                {/* Decoration Graphic */}
+                <div className="absolute top-10 right-0 opacity-[0.15] transform translate-x-1/4 scale-125 z-0">
+                    <Activity size={180} strokeWidth={1} />
                 </div>
             </div>
 
-            <LiveTrackingMap
-                myLocation={myLocation}
-                name={name}
-                userType="Doctor"
-                myColor={myColor}
-                needsCare={false}
-                users={users}
-                incomingDoctors={incomingDoctors}
-                nearbyPatients={nearbyPatients}
-                acceptingPatientId={acceptingPatientId}
-            />
+            {/* Bottom Floating White Container with massive border radius */}
+            <div className="flex-1 flex flex-col bg-slate-50 dark:bg-slate-900 rounded-t-[2.5rem] shadow-[0_-12px_30px_rgb(0,0,0,0.2)] overflow-hidden relative z-10 -mt-6">
+
+                {/* Fixed Control Overlay for Target Selection placed directly over the Map */}
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] pointer-events-none flex flex-col gap-3">
+                    <AnimatePresence>
+                        {nearbyPatients.length > 0 && (
+                            <motion.div
+                                initial={{ y: -20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -20, opacity: 0 }}
+                                className="pointer-events-auto bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl rounded-[1.5rem] p-4 shadow-xl border border-danger-DEFAULT/20 relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 left-0 w-1 h-full bg-danger-DEFAULT animate-pulse"></div>
+
+                                <div className="flex items-center gap-2 mb-3 px-2">
+                                    <AlertTriangle className="text-danger-DEFAULT animate-bounce drop-shadow" size={20} />
+                                    <span className="text-sm font-extrabold text-slate-800 dark:text-slate-100 tracking-wide">
+                                        {nearbyPatients.length} EMERGENCY {nearbyPatients.length === 1 ? 'SIGNAL' : 'SIGNALS'}
+                                    </span>
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <div className="relative">
+                                        <select
+                                            className="w-full appearance-none bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 text-sm font-semibold rounded-xl px-4 py-3.5 pr-10 focus:outline-none focus:ring-2 focus:ring-danger-DEFAULT/50 transition-shadow drop-shadow-sm cursor-pointer"
+                                            value={acceptingPatientId || ''}
+                                            onChange={(e) => {
+                                                const selected = e.target.value;
+                                                if (selected) {
+                                                    setAcceptingPatientId(selected);
+                                                    setIsAcceptingHelp(true);
+                                                } else {
+                                                    setAcceptingPatientId(null);
+                                                    setIsAcceptingHelp(false);
+                                                }
+                                            }}
+                                        >
+                                            <option value="" className="text-slate-500 font-medium select-none text-center">Tap to assign patient target...</option>
+                                            {nearbyPatients.map(p => (
+                                                <option key={p.user.id} value={p.user.id} className="font-bold py-2">
+                                                    🆘 {p.user.name} ({formatDist(p.distance)} away)
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                                        </div>
+                                    </div>
+
+                                    {acceptingPatientId && nearbyPatients.find(p => p.user.id === acceptingPatientId) && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            className="mt-1 flex items-center justify-center gap-2 bg-success-DEFAULT/10 dark:bg-success-dark/20 text-success-DEFAULT dark:text-success-light py-2 rounded-xl border border-success-DEFAULT/20"
+                                        >
+                                            <Locate size={16} strokeWidth={3} className="animate-pulse" />
+                                            <span className="text-[0.8rem] font-black uppercase tracking-wider">
+                                                Tracking: {formatDist(nearbyPatients.find(p => p.user.id === acceptingPatientId)!.distance)}
+                                            </span>
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Floating Locate Button Bottom Right */}
+                <div className="absolute bottom-8 right-4 z-[1000] pointer-events-auto">
+                    <button
+                        onClick={centerMapToMe}
+                        className="bg-white/95 dark:bg-slate-800/95 text-emerald-600 dark:text-emerald-400 p-3.5 rounded-2xl shadow-[0_8px_20px_rgb(0,0,0,0.15)] border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform backdrop-blur-md"
+                    >
+                        <Locate strokeWidth={2.5} size={28} />
+                    </button>
+                </div>
+
+                <div className="flex-1 w-full h-full relative z-0">
+                    <LiveTrackingMap
+                        myLocation={myLocation}
+                        name={name}
+                        userType="Doctor"
+                        myColor={myColor}
+                        needsCare={false}
+                        users={users}
+                        incomingDoctors={incomingDoctors}
+                        nearbyPatients={nearbyPatients}
+                        acceptingPatientId={acceptingPatientId}
+                    />
+                </div>
+            </div>
         </div>
     );
 };

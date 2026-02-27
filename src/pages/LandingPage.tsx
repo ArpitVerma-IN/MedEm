@@ -11,30 +11,29 @@ export const LandingPage = () => {
         e.preventDefault();
         if (!name.trim()) return;
 
-        // Navigate and safely pass state 
-        // Usually in BaaS this is an auth token, but for now we pass state.
         navigate(`/${userType.toLowerCase()}`, {
             state: { name: name.trim() }
         });
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="glass-panel modal-content">
-                <div className="modal-icon-container">
-                    <div className="modal-icon">
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[2000] flex items-center justify-center p-4">
+            <div className="w-full max-w-sm bg-slate-800/80 backdrop-blur-xl border border-slate-700 shadow-2xl rounded-3xl p-8 flex flex-col gap-6 text-center">
+                <div className="flex justify-center mb-2">
+                    <div className="w-16 h-16 bg-med-DEFAULT/20 text-med-light rounded-full flex items-center justify-center shadow-inner">
                         <Map size={32} />
                     </div>
                 </div>
-                <div className="title-container">
-                    <h1 className="modal-title">MedEm</h1>
-                    <p className="modal-desc">Select your portal to enter the emergency responder network.</p>
+
+                <div className="flex flex-col">
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent mb-2">MedEm</h1>
+                    <p className="text-slate-400 text-sm leading-relaxed">Select your portal to enter the emergency responder network.</p>
                 </div>
 
-                <form onSubmit={handleJoin} className="input-group">
+                <form onSubmit={handleJoin} className="flex flex-col gap-4">
                     <input
                         type="text"
-                        className="text-input"
+                        className="w-full px-4 py-3.5 rounded-xl border border-slate-600 bg-slate-900/50 text-white text-base placeholder-slate-500 focus:outline-none focus:border-med-DEFAULT focus:ring-2 focus:ring-med-DEFAULT/20 transition-all font-inter"
                         placeholder="Your name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -43,28 +42,32 @@ export const LandingPage = () => {
                         required
                     />
 
-                    <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '16px' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <div className="flex gap-4 justify-center mt-2">
+                        <label className="flex items-center gap-2 cursor-pointer text-slate-300 font-medium hover:text-white transition-colors">
                             <input
                                 type="radio"
                                 checked={userType === 'Patient'}
                                 onChange={() => setUserType('Patient')}
-                                style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
+                                className="w-4 h-4 accent-med-DEFAULT"
                             />
-                            I am a Patient
+                            Patient
                         </label>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                        <label className="flex items-center gap-2 cursor-pointer text-slate-300 font-medium hover:text-white transition-colors">
                             <input
                                 type="radio"
                                 checked={userType === 'Doctor'}
                                 onChange={() => setUserType('Doctor')}
-                                style={{ accentColor: 'var(--primary)', width: '16px', height: '16px' }}
+                                className="w-4 h-4 accent-med-DEFAULT"
                             />
-                            I am a Doctor
+                            Doctor
                         </label>
                     </div>
 
-                    <button type="submit" className="primary-btn" style={{ marginTop: '24px' }} disabled={!name.trim()}>
+                    <button
+                        type="submit"
+                        className="mt-4 w-full bg-gradient-to-br from-med-DEFAULT to-med-dark hover:from-med-light hover:to-med-DEFAULT text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-med-DEFAULT/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                        disabled={!name.trim()}
+                    >
                         Enter Portal
                     </button>
                 </form>
