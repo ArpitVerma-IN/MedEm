@@ -71,6 +71,13 @@ export const LandingPage = () => {
                         Enter Portal
                     </button>
                 </form>
+
+                {/* Netlify Open Source Badge */}
+                <div className="mt-8 flex justify-center">
+                    <a href="https://www.netlify.com" target="_blank" rel="noopener noreferrer" className="hover:scale-105 transition-transform opacity-90 hover:opacity-100">
+                        <img src="https://www.netlify.com/assets/badges/netlify-badge-color-accent.svg" alt="Deploys by Netlify" className="h-8 shadow-sm rounded drop-shadow-md" />
+                    </a>
+                </div>
             </div>
         </div>
     );
