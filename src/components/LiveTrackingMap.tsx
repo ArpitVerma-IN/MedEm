@@ -5,16 +5,21 @@ import 'leaflet/dist/leaflet.css';
 import { Maximize2, Minimize2, X } from 'lucide-react';
 import type { User, Location as UserLocation } from '../types';
 
-// Create a custom hook to center the map on a location
+// Create a custom hook to center the map on a location with a slight debounce
 const MapController = ({ center }: { center: [number, number] | null }) => {
     const map = useMap();
     useEffect(() => {
-        if (center) {
+        if (!center) return;
+
+        // Delay centering to smoothen out quick flickering from noisy live location pings
+        const timeoutId = setTimeout(() => {
             map.flyTo(center, map.getZoom(), {
                 animate: true,
                 duration: 1.5
             });
-        }
+        }, 800);
+
+        return () => clearTimeout(timeoutId);
     }, [center, map]);
     return null;
 };
