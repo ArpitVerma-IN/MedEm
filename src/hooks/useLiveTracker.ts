@@ -157,16 +157,20 @@ export const useLiveTracker = ({
             });
             setNearbyPatients(nearby);
             setIncomingDoctors([]);
-        } else if (userType === 'Patient' && needsCare) {
-            const doctors: { user: User, distance: number }[] = [];
-            Array.from(users.values()).forEach(user => {
-                if (user.userType === 'Doctor' && user.acceptingPatientId === socket?.id && user.location) {
-                    const userLatLng = L.latLng(user.location.lat, user.location.lng);
-                    const distance = myLatLng.distanceTo(userLatLng);
-                    doctors.push({ user, distance });
-                }
-            });
-            setIncomingDoctors(doctors);
+        } else if (userType === 'Patient') {
+            if (needsCare) {
+                const doctors: { user: User, distance: number }[] = [];
+                Array.from(users.values()).forEach(user => {
+                    if (user.userType === 'Doctor' && user.acceptingPatientId === socket?.id && user.location) {
+                        const userLatLng = L.latLng(user.location.lat, user.location.lng);
+                        const distance = myLatLng.distanceTo(userLatLng);
+                        doctors.push({ user, distance });
+                    }
+                });
+                setIncomingDoctors(doctors);
+            } else {
+                setIncomingDoctors([]);
+            }
             setNearbyPatients([]);
         }
     }, [users, myLocation, isJoined, userType, needsCare, acceptingPatientId, socket]);
