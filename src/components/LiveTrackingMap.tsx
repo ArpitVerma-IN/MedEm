@@ -137,9 +137,9 @@ export const LiveTrackingMap = ({
     );
 
     return (
-        <div className="w-full h-full absolute inset-0 z-0 flex flex-col pointer-events-none">
+        <div className="w-full relative flex flex-col pointer-events-none isolate">
             {mapState === 'collapsed' && (
-                <div className="w-full h-full flex flex-col items-center justify-center pt-24 pb-8 px-6 pointer-events-auto">
+                <div className="w-full flex flex-col items-center justify-center py-12 px-6 pointer-events-auto border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] bg-slate-50/50 dark:bg-slate-800/20">
                     <div className="flex flex-col items-center gap-4 text-center">
                         <div className="w-16 h-16 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-500 shadow-inner">
                             <svg className="w-8 h-8 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -163,33 +163,31 @@ export const LiveTrackingMap = ({
             )}
 
             {mapState === 'mini' && (
-                <div className="w-full h-full flex flex-col items-center justify-center pt-32 pb-24 px-6 pointer-events-none animate-in fade-in zoom-in-95 duration-300">
-                    <div className="w-full max-w-sm aspect-[4/5] max-h-[50vh] bg-slate-200 dark:bg-slate-800 rounded-[2rem] shadow-2xl border-[6px] border-white dark:border-slate-700 overflow-hidden relative pointer-events-auto flex flex-col">
-                        <div className="absolute top-3 right-3 z-[2000] flex flex-col gap-2">
-                            <button onClick={() => setMapState('large')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
-                                <Maximize2 size={18} strokeWidth={2.5} />
-                            </button>
-                            <button onClick={() => setMapState('collapsed')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-danger-DEFAULT pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
-                                <X size={18} strokeWidth={2.5} />
-                            </button>
-                        </div>
-                        <div className="flex-1 w-full relative z-0">
-                            <MapContainer
-                                center={defaultCenter}
-                                zoom={15}
-                                zoomControl={false}
-                                style={{ height: '100%', width: '100%', zIndex: 1 }}
-                            >
-                                {renderMapElements()}
-                            </MapContainer>
-                        </div>
+                <div className="w-full aspect-[4/5] min-h-[350px] max-h-[500px] bg-slate-200 dark:bg-slate-800 rounded-[2rem] shadow-xl border-[6px] border-white dark:border-slate-700 overflow-hidden relative pointer-events-auto animate-in fade-in zoom-in-95 duration-300 isolate">
+                    <div className="absolute top-3 right-3 z-[2000] flex flex-col gap-2">
+                        <button onClick={() => setMapState('large')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
+                            <Maximize2 size={18} strokeWidth={2.5} />
+                        </button>
+                        <button onClick={() => setMapState('collapsed')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-danger-DEFAULT pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
+                            <X size={18} strokeWidth={2.5} />
+                        </button>
+                    </div>
+                    <div className="flex-1 w-full h-full relative z-0">
+                        <MapContainer
+                            center={defaultCenter}
+                            zoom={15}
+                            zoomControl={false}
+                            style={{ height: '100%', width: '100%', zIndex: 1 }}
+                        >
+                            {renderMapElements()}
+                        </MapContainer>
                     </div>
                 </div>
             )}
 
             {mapState === 'large' && (
-                <div className="w-full h-full relative pointer-events-auto animate-in fade-in duration-300">
-                    <div className="absolute top-36 right-4 z-[2000] flex flex-col gap-2 pointer-events-auto">
+                <div className="fixed inset-0 z-[5000] bg-slate-900 pointer-events-auto animate-in fade-in duration-300 flex flex-col">
+                    <div className="absolute top-8 right-6 z-[2000] flex flex-col gap-2 pointer-events-auto">
                         <button onClick={() => setMapState('mini')} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 cursor-pointer">
                             <Minimize2 size={24} strokeWidth={2.5} />
                         </button>
