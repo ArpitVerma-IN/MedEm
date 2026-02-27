@@ -17,24 +17,29 @@
 
 ## 📖 Overview
 
-**MedEm** is an advanced minimum viable preview/prototype for evaluating live-tracking infrastructure in large-scale medical applications. 
+**MedEm** is an advanced minimum viable prototype for evaluating live-tracking infrastructure in large-scale medical applications. 
 
-By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it enables multiple remote users (Doctors and Patients) to stream their exact cross-global coordinates securely onto a dynamic leaflet map in real-time, effectively simulating a rapid-response emergency broadcast network.
+By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it enables multiple remote users (Doctors and Patients) to stream their exact cross-global coordinates securely onto a dynamic leaflet map in real-time. Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely independent, mobile-first responsive dashboards tailored explicitly for Patients and Responders using Tailwind CSS and Framer Motion.
 
 ---
 
 ## ✨ Key Features & Architecture
 
+### 📱 Independent Mobile-First Dashboards
+- **Patient Portal:** A calming, deeply-colored indigo ecosystem focused on ease of use. Features a massive central "Medical Care" SOS button, an elastic Live Map that dynamically expands/minimizes, and an intuitive bottom navigation bar.
+- **Responder (Doctor) Portal:** A high-contrast emerald interface built for rapid triage. It automatically pulls active SOS signals into a floating targeting console, allowing Doctors to instantly lock onto a patient's exact location.
+
 ### 🚑 Emergency Broadcast System (500m Geofence)
 - **Role Detection:** Upon login, users distinctly select to join as either a **Patient** or a **Doctor**.
 - **Dynamic Alerts:** If a Patient securely declares they `"need medical care!"` and actively enters a **500-meter radius** of a logged-in Doctor, the Doctor's dashboard triggers an emergency state—deploying red banners and aggressively pulsating map markers to draw direct attention to the patient's coordinates.
-- **Targeted Rescue Mode:** Doctors can triage patients. By accepting to assist a specific patient from their dropdown UI, the system targets *only* that patient. It displays a live decreasing Approach Distance (`e.g., Active Rescue: 240 m`) for the Doctor, while broadcasting a calming `A Doctor is on the way!` banner privately only to the Patient.
+- **Targeted Rescue Mode:** Doctors can triage patients. By accepting to assist a specific patient from their targeting UI, the system engages *only* that patient. It displays a live decreasing Approach Distance (`e.g., Tracking: 240 m`) for the Doctor, while broadcasting a private `A Doctor is on the way!` slide-up banner to the Patient.
+- **Tripartite Elastic Map:** To conserve screen real-estate on mobile phones, the Live Map transitions beautifully through three fluid states: *Collapsed* (battery-saving), *Mini-Modal* (boxed contextual overview), and *Fullscreen* (tactical navigation).
 
 ### ⚡ Technology Stack
 - **Frontend Framework:** React 19 + TypeScript (Powered by Vite)
+- **Aesthetic System:** Tailwind CSS v4 + Framer Motion + Lucide-React SVGs
 - **Live Connection Layer:** Socket.IO / WebSockets (Client & Server)
 - **Cartography Engine:** React-Leaflet + Leaflet.js
-- **Aesthetic System:** Lucide-React SVG + Flexbox/Glassmorphism CSS overlays.
 - **Backend Infrastructure:** Express server running dynamically on Node.js
 
 ---
