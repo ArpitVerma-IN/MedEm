@@ -11,12 +11,14 @@ interface BottomNavProps {
 }
 
 export const BottomNav = ({ activeTab, onChange, userType }: BottomNavProps) => {
-    const tabs = [
-        { id: 'home', label: 'Home', icon: Home },
-        { id: 'ai', label: 'AI Assist', icon: Bot },
-        { id: 'history', label: 'History', icon: History },
-        { id: 'profile', label: 'Profile', icon: UserCircle2 },
+    const allTabs = [
+        { id: 'home', label: 'Home', icon: Home, roles: ['Patient', 'Doctor'] },
+        { id: 'ai', label: 'AI Assist', icon: Bot, roles: ['Patient'] },
+        { id: 'history', label: 'History', icon: History, roles: ['Patient', 'Doctor'] },
+        { id: 'profile', label: 'Profile', icon: UserCircle2, roles: ['Patient', 'Doctor'] },
     ];
+
+    const tabs = allTabs.filter(tab => tab.roles.includes(userType));
 
     // Specific accent coloring based on role and tab
     const getTabColor = (isActive: boolean) => {
