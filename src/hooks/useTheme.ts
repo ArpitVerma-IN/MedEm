@@ -1,31 +1,51 @@
 import { useState, useEffect } from 'react';
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 export function useTheme() {
-    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const [mode, setMode] = useState<ThemeMode>(() => {
         if (typeof window !== 'undefined') {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light' || savedTheme === 'dark') {
-                return savedTheme;
-            }
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                return 'dark';
+            const savedMode = localStorage.getItem('themeMode') as ThemeMode;
+            if (savedMode === 'light' || savedMode === 'dark' || savedMode === 'system') {
+                return savedMode;
             }
         }
-        return 'light';
+        return 'system';
     });
 
     useEffect(() => {
         const root = window.document.documentElement;
 
-        root.classList.remove('light', 'dark');
-        root.classList.add(theme);
+        const applyTheme = (currentMode: ThemeMode) => {
+            root.classList.remove('light', 'dark');
+            let resolvedTheme = currentMode;
 
-        localStorage.setItem('theme', theme);
-    }, [theme]);
+            if (currentMode === 'system') {
+                resolvedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
 
-    const toggleTheme = () => {
-        setTheme(prev => prev === 'light' ? 'dark' : 'light');
+            root.classList.add(resolvedTheme);
+        };
+
+        applyTheme(mode);
+        localStorage.setItem('themeMode', mode);
+
+        if (mode === 'system') {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleChange = () => applyTheme('system');
+
+            mediaQuery.addEventListener('change', handleChange);
+            return () => mediaQuery.removeEventListener('change', handleChange);
+        }
+    }, [mode]);
+
+    const cycleTheme = () => {
+        setMode(prev => {
+            if (prev === 'system') return 'dark';
+            if (prev === 'dark') return 'light';
+            return 'system'; // light -> system
+        });
     };
 
-    return { theme, toggleTheme };
+    return { mode, cycleTheme };
 }

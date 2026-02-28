@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
-import { Settings, FileText, UserCog, LogOut, Moon, Sun, Bell } from 'lucide-react';
+import { Settings, FileText, UserCog, LogOut, Moon, Sun, Bell, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 
 export const ProfileView = ({ name }: { name: string }) => {
     const navigate = useNavigate();
-    const { theme, toggleTheme } = useTheme();
+    const { mode, cycleTheme } = useTheme();
 
     const handleLogout = () => {
         navigate('/');
@@ -34,7 +34,12 @@ export const ProfileView = ({ name }: { name: string }) => {
                     { label: 'Report Upload Options', icon: FileText, color: 'text-indigo-500' },
                     { label: 'Notification Settings', icon: Bell, color: 'text-orange-500' },
                     { label: 'App Settings', icon: Settings, color: 'text-gray-500 dark:text-gray-400' },
-                    { label: theme === 'dark' ? 'Enable Light Mode' : 'Enable Dark Mode', icon: theme === 'dark' ? Sun : Moon, color: 'text-amber-500 dark:text-indigo-400', action: toggleTheme }
+                    {
+                        label: `Theme: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`,
+                        icon: mode === 'system' ? Monitor : mode === 'dark' ? Moon : Sun,
+                        color: mode === 'system' ? 'text-blue-500 dark:text-blue-400' : mode === 'dark' ? 'text-indigo-400' : 'text-amber-500',
+                        action: cycleTheme
+                    }
                 ].map((item, idx) => {
                     const Icon = item.icon;
                     return (

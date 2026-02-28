@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
-import { Settings, FileCheck, UserCog, LogOut, Moon, Sun, Bell } from 'lucide-react';
+import { Settings, FileCheck, UserCog, LogOut, Moon, Sun, Bell, Monitor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 
 export const DoctorProfileView = ({ name }: { name: string }) => {
     const navigate = useNavigate();
-    const { theme, toggleTheme } = useTheme();
+    const { mode, cycleTheme } = useTheme();
 
     const handleLogout = () => {
         navigate('/');
@@ -38,7 +38,12 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
                     { label: 'Responder Settings', icon: UserCog, color: 'text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30' },
                     { label: 'Alert Preferences', icon: Bell, color: 'text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30' },
                     { label: 'App Settings', icon: Settings, color: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800' },
-                    { label: theme === 'dark' ? 'Enable Light Mode' : 'Enable Dark Mode', icon: theme === 'dark' ? Sun : Moon, color: 'text-amber-500 dark:text-indigo-400 bg-slate-200 dark:bg-slate-700', action: toggleTheme }
+                    {
+                        label: `Theme: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`,
+                        icon: mode === 'system' ? Monitor : mode === 'dark' ? Moon : Sun,
+                        color: mode === 'system' ? 'text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30' : mode === 'dark' ? 'text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30' : 'text-amber-500 bg-amber-50 dark:bg-amber-900/30',
+                        action: cycleTheme
+                    }
                 ].map((item, idx) => {
                     const Icon = item.icon;
                     return (
