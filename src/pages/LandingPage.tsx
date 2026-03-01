@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Map, User as GuestIcon, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,12 +9,27 @@ export const LandingPage = () => {
     const [showGuestForm, setShowGuestForm] = useState(false);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const storedName = localStorage.getItem('medem_guest_name');
+        const storedType = localStorage.getItem('medem_guest_type');
+
+        if (storedName && storedType) {
+            navigate(`/${storedType.toLowerCase()}`, {
+                state: { name: storedName }
+            });
+        }
+    }, [navigate]);
+
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name.trim()) return;
+        const finalName = name.trim();
+        if (!finalName) return;
+
+        localStorage.setItem('medem_guest_name', finalName);
+        localStorage.setItem('medem_guest_type', userType);
 
         navigate(`/${userType.toLowerCase()}`, {
-            state: { name: name.trim() }
+            state: { name: finalName }
         });
     };
 

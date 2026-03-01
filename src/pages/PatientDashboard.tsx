@@ -19,7 +19,7 @@ export const PatientDashboard = () => {
     const routerState = useLocation().state as { name?: string } | null;
     const navigate = useNavigate();
 
-    const [name] = useState(routerState?.name || '');
+    const [name] = useState(routerState?.name || localStorage.getItem('medem_guest_name') || '');
     const [myColor] = useState(getRandomColor());
     const [error, setError] = useState<string | null>(null);
 

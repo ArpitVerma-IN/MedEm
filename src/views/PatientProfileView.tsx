@@ -8,7 +8,11 @@ export const ProfileView = ({ name }: { name: string }) => {
     const { mode, cycleTheme } = useTheme();
 
     const handleLogout = () => {
-        navigate('/');
+        if (window.confirm("Are you sure you want to log out?")) {
+            localStorage.removeItem('medem_guest_name');
+            localStorage.removeItem('medem_guest_type');
+            navigate('/');
+        }
     };
 
     return (
