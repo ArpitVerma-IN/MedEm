@@ -148,7 +148,7 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
 
 ## 🤝 Contributing & Contact
 
-I actively welcome open-source developers to contribute to this project! If you find MedEm's core mission compelling, feel free to fork this repository, submit Pull Requests, or open Issues for new feature suggestions or bug fixes. Let's build a better, faster, and more robust emergency tracking platform together!
+I actively welcome open-source developers to contribute to this project! If you find MedEm's core mission compelling, feel free to submit Pull Requests, or open Issues for new feature suggestions or bug fixes. Let's build a better, faster, and more robust emergency tracking platform together!
 
 Connect with me using the links below:
 
