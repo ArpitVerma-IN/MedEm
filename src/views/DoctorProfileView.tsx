@@ -1,9 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, FileCheck, UserCog, LogOut, Moon, Sun, Bell, Monitor, ShieldAlert, Upload, Info, Shield } from 'lucide-react';
+import { Settings, FileCheck, UserCog, LogOut, Moon, Sun, Bell, Monitor, ShieldAlert, Info, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { SettingsSubView } from '../components/SettingsSubView';
 import { useState } from 'react';
+import { UploadCertifications } from './responder-settings/UploadCertifications';
+import { ResponderSettings } from './responder-settings/ResponderSettings';
+import { AlertPreferences } from './responder-settings/AlertPreferences';
+import { AppSettings } from './responder-settings/AppSettings';
+import { AccountSettings } from './responder-settings/AccountSettings';
+import { AboutMedEm } from './responder-settings/AboutMedEm';
+import { PrivacyPolicy } from './responder-settings/PrivacyPolicy';
 
 export const DoctorProfileView = ({ name }: { name: string }) => {
     const navigate = useNavigate();
@@ -17,141 +24,6 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
             navigate('/');
         }
     };
-
-    const renderUploadCertifications = () => (
-        <div className="space-y-4">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Upload your government-issued medical license or responder certification to verify your account and access live patient SOS requests.</p>
-            <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-8 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900/50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors gap-3">
-                <div className="w-12 h-12 bg-success-100 dark:bg-success-900/40 text-success-DEFAULT flex items-center justify-center rounded-xl shadow-sm">
-                    <Upload size={24} />
-                </div>
-                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Tap to upload proof of certification</p>
-                <p className="text-xs font-medium text-slate-500">Supports PDF, JPG, PNG up to 10MB</p>
-            </div>
-            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mt-4">
-                <p className="text-sm text-amber-800 dark:text-amber-300 font-medium tracking-wide">Note: Automated AI Vision Verification is rolling out in Phase 3.</p>
-            </div>
-        </div>
-    );
-
-    const renderResponderSettings = () => (
-        <div className="space-y-4">
-            <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Response Vehicle Mode</label>
-                <select className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" defaultValue="Personal Vehicle">
-                    <option>Walking / Running</option>
-                    <option>Bicycle</option>
-                    <option>Personal Vehicle</option>
-                    <option>Registered Ambulance</option>
-                </select>
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Max Notification Radius</label>
-                <select className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white" defaultValue="5 km">
-                    <option>1 km</option>
-                    <option>5 km</option>
-                    <option>10 km</option>
-                    <option>Region Wide</option>
-                </select>
-            </div>
-            <button className="w-full bg-success-DEFAULT text-white font-bold py-3.5 rounded-xl hover:bg-success-dark transition-colors active:scale-95 shadow-md">Update Preferences</button>
-        </div>
-    );
-
-    const renderAlertPreferences = () => (
-        <div className="space-y-4">
-            {['Critical SOS Overrides (Bypass DND)', 'Passive Assistance Requests', 'In-App Sound Pings'].map((label, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">{label}</span>
-                    <input type="checkbox" defaultChecked={i !== 1} className="w-5 h-5 accent-success-DEFAULT cursor-pointer" />
-                </div>
-            ))}
-        </div>
-    );
-
-    const renderAppSettings = () => (
-        <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Continuous Location Broadcasting</span>
-                    <span className="text-xs text-slate-500 font-medium mt-0.5">Required for accurately dispatching nearby SOS</span>
-                </div>
-                <input type="checkbox" defaultChecked className="w-5 h-5 accent-success-DEFAULT cursor-pointer" />
-            </div>
-            <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm mt-4">
-                <div className="flex flex-col">
-                    <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Background App Refresh</span>
-                    <span className="text-xs text-slate-500 font-medium mt-0.5">Keep MedEm alive while in pocket</span>
-                </div>
-                <input type="checkbox" defaultChecked className="w-5 h-5 accent-success-DEFAULT cursor-pointer" />
-            </div>
-        </div>
-    );
-
-    const renderAccountSettings = () => (
-        <div className="space-y-6">
-            <div className="bg-slate-50 dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2">Account Export</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed font-medium">Download a copy of your responder activity logs and verification traces.</p>
-                <button className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 font-bold py-3 rounded-xl text-sm hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm transition-colors active:scale-95">Request Data Archive</button>
-            </div>
-
-            <div className="bg-danger-50 dark:bg-danger-900/10 p-5 rounded-2xl border border-danger-200 dark:border-danger-900/30">
-                <h3 className="text-sm font-bold text-danger-DEFAULT dark:text-danger-400 mb-2">Danger Zone</h3>
-                <p className="text-xs text-danger-800/80 dark:text-danger-400/80 mb-4 leading-relaxed font-medium">Permanently delete your account and wipe all history from our secure MedEm servers.</p>
-                <button className="w-full bg-danger-DEFAULT text-white font-bold py-3 rounded-xl text-sm shadow-md hover:bg-danger-dark transition-colors active:scale-95">Delete Account</button>
-            </div>
-        </div>
-    );
-
-    const renderAboutMedEm = () => (
-        <div className="space-y-6">
-            <div className="flex flex-col items-center justify-center mb-4">
-                <div className="w-16 h-16 bg-success-100 dark:bg-success-900/40 text-success-DEFAULT dark:text-success-light rounded-[20px] flex items-center justify-center shadow-inner border border-success-200 dark:border-success-DEFAULT/20 mb-4">
-                    <Info size={32} strokeWidth={2.5} />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">About MedEm</h3>
-                <p className="text-sm font-medium text-slate-500 mt-1">Responder Edition - v1.0.0</p>
-            </div>
-
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Empowering Real-Time Rescues</h4>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                    MedEm functions as a high-frequency tracking network specifically designed for verified medical professionals to intercept emergency SOS beacons in their direct vicinity.
-                </p>
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50">
-                    <h5 className="text-blue-800 dark:text-blue-300 font-bold mb-1">Coming Soon (Phase 2 & 3)</h5>
-                    <ul className="text-xs text-blue-700/80 dark:text-blue-300/80 list-disc pl-4 space-y-1">
-                        <li>AI Vision-based verification of your uploaded medical credentials.</li>
-                        <li>Live AI-Summaries of patient history generated the moment you accept an SOS.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div className="flex justify-center mt-8">
-                <a href="https://github.com/ArpitVerma-IN/MedEm" target="_blank" rel="noopener noreferrer" className="text-success-DEFAULT hover:text-success-dark dark:text-success-light dark:hover:text-white text-sm font-bold flex items-center gap-2 transition-colors">
-                    View Project on GitHub
-                </a>
-            </div>
-        </div>
-    );
-
-    const renderPrivacyPolicy = () => (
-        <div className="space-y-4 text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                <h4 className="font-bold text-slate-900 dark:text-white mb-2">Data Protection</h4>
-                <p>We respect your privacy as a medical professional. Your real-time location is never permanently stored on our servers and is only actively broadcasted and visible over the WebSockets when your system engages an active SOS ping.</p>
-            </div>
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-                <h4 className="font-bold text-slate-900 dark:text-white mb-2">Certification Processing</h4>
-                <p className="mb-3">Once AI document processing rolls out in upcoming updates, your license files will be scanned purely for verification extraction before being immediately encrypted and securely vaulted.</p>
-                <p className="text-success-DEFAULT dark:text-success-light font-bold">The feature is releasing soon, please check the about section to know more.</p>
-            </div>
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400 mt-6">
-                Please refer to the complete privacy_policy.txt file in our root repository for all legal disclosures.
-            </div>
-        </div>
-    );
 
     return (
         <>
@@ -220,13 +92,13 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
             </motion.div>
 
             <AnimatePresence>
-                {activePage === 'Upload Medical Certifications' && <SettingsSubView title="Verification" onBack={() => setActivePage(null)}>{renderUploadCertifications()}</SettingsSubView>}
-                {activePage === 'Responder Settings' && <SettingsSubView title="Responder Profile" onBack={() => setActivePage(null)}>{renderResponderSettings()}</SettingsSubView>}
-                {activePage === 'Alert Preferences' && <SettingsSubView title="Notifications" onBack={() => setActivePage(null)}>{renderAlertPreferences()}</SettingsSubView>}
-                {activePage === 'App Settings' && <SettingsSubView title="App Settings" onBack={() => setActivePage(null)}>{renderAppSettings()}</SettingsSubView>}
-                {activePage === 'About MedEm' && <SettingsSubView title="About MedEm" onBack={() => setActivePage(null)}>{renderAboutMedEm()}</SettingsSubView>}
-                {activePage === 'Privacy Policy' && <SettingsSubView title="Privacy Policy" onBack={() => setActivePage(null)}>{renderPrivacyPolicy()}</SettingsSubView>}
-                {activePage === 'Account Settings' && <SettingsSubView title="Account Settings" onBack={() => setActivePage(null)}>{renderAccountSettings()}</SettingsSubView>}
+                {activePage === 'Upload Medical Certifications' && <SettingsSubView title="Verification" onBack={() => setActivePage(null)}><UploadCertifications /></SettingsSubView>}
+                {activePage === 'Responder Settings' && <SettingsSubView title="Responder Profile" onBack={() => setActivePage(null)}><ResponderSettings /></SettingsSubView>}
+                {activePage === 'Alert Preferences' && <SettingsSubView title="Notifications" onBack={() => setActivePage(null)}><AlertPreferences /></SettingsSubView>}
+                {activePage === 'App Settings' && <SettingsSubView title="App Settings" onBack={() => setActivePage(null)}><AppSettings /></SettingsSubView>}
+                {activePage === 'About MedEm' && <SettingsSubView title="About MedEm" onBack={() => setActivePage(null)}><AboutMedEm /></SettingsSubView>}
+                {activePage === 'Privacy Policy' && <SettingsSubView title="Privacy Policy" onBack={() => setActivePage(null)}><PrivacyPolicy /></SettingsSubView>}
+                {activePage === 'Account Settings' && <SettingsSubView title="Account Settings" onBack={() => setActivePage(null)}><AccountSettings /></SettingsSubView>}
             </AnimatePresence>
         </>
     );
