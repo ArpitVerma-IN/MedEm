@@ -1,0 +1,28 @@
+PRIVACY POLICY FOR MEDEM
+
+Effective Date: March 3, 2026
+
+1. INTRODUCTION
+Welcome to MedEm. We respect your privacy and are committed to protecting your personal data and medical information. This privacy policy will inform you as to how we handle your personal data when you visit our application and use our emergency responder network.
+
+2. DATA WE COLLECT
+- Personal Identity Data: First name, last name, and role (Patient/Responder).
+- Contact Data: Email address and phone numbers (Rolling out soon in Phase 2).
+- Location Data: Real-time GPS coordinates to facilitate emergency SOS tracking.
+- Medical Data: User-uploaded records, blood type, and certifications (Releasing soon, please check the about section to know more).
+
+3. HOW WE USE YOUR DATA
+- To provide live-tracking synchronization between patients and verified responders.
+- to verify the identities and qualifications of medical responders (Releasing soon, please check the about section to know more).
+- To generate AI medical summaries for incoming responders in critical emergencies (Releasing soon, please check the about section to know more).
+
+4. DATA SHARING
+During an active SOS ping, your location and basic profile information are shared strictly with verified medical responders within your immediate radius. We do not sell your data to third-party marketers or brokers.
+
+5. YOUR LEGAL RIGHTS
+- Request access to your personal data (Account Export feature).
+- Request erasure of your personal data ("Danger Zone" Account Deletion).
+- Withdraw consent at any time where we are relying on consent to process your personal data.
+
+6. CONTACT US
+If you have any questions about this privacy policy, please contact our data privacy manager or raise an issue on our official GitHub repository.

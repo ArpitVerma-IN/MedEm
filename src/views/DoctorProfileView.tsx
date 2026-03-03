@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Settings, FileCheck, UserCog, LogOut, Moon, Sun, Bell, Monitor, ShieldAlert, Upload } from 'lucide-react';
+import { Settings, FileCheck, UserCog, LogOut, Moon, Sun, Bell, Monitor, ShieldAlert, Upload, Info, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/useTheme';
 import { SettingsSubView } from '../components/SettingsSubView';
@@ -104,6 +104,55 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
         </div>
     );
 
+    const renderAboutMedEm = () => (
+        <div className="space-y-6">
+            <div className="flex flex-col items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-success-100 dark:bg-success-900/40 text-success-DEFAULT dark:text-success-light rounded-[20px] flex items-center justify-center shadow-inner border border-success-200 dark:border-success-DEFAULT/20 mb-4">
+                    <Info size={32} strokeWidth={2.5} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">About MedEm</h3>
+                <p className="text-sm font-medium text-slate-500 mt-1">Responder Edition - v1.0.0</p>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Empowering Real-Time Rescues</h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+                    MedEm functions as a high-frequency tracking network specifically designed for verified medical professionals to intercept emergency SOS beacons in their direct vicinity.
+                </p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50">
+                    <h5 className="text-blue-800 dark:text-blue-300 font-bold mb-1">Coming Soon (Phase 2 & 3)</h5>
+                    <ul className="text-xs text-blue-700/80 dark:text-blue-300/80 list-disc pl-4 space-y-1">
+                        <li>AI Vision-based verification of your uploaded medical credentials.</li>
+                        <li>Live AI-Summaries of patient history generated the moment you accept an SOS.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div className="flex justify-center mt-8">
+                <a href="https://github.com/ArpitVerma-IN/MedEm" target="_blank" rel="noopener noreferrer" className="text-success-DEFAULT hover:text-success-dark dark:text-success-light dark:hover:text-white text-sm font-bold flex items-center gap-2 transition-colors">
+                    View Project on GitHub
+                </a>
+            </div>
+        </div>
+    );
+
+    const renderPrivacyPolicy = () => (
+        <div className="space-y-4 text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                <h4 className="font-bold text-slate-900 dark:text-white mb-2">Data Protection</h4>
+                <p>We respect your privacy as a medical professional. Your real-time location is never permanently stored on our servers and is only actively broadcasted and visible over the WebSockets when your system engages an active SOS ping.</p>
+            </div>
+            <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
+                <h4 className="font-bold text-slate-900 dark:text-white mb-2">Certification Processing</h4>
+                <p className="mb-3">Once AI document processing rolls out in upcoming updates, your license files will be scanned purely for verification extraction before being immediately encrypted and securely vaulted.</p>
+                <p className="text-success-DEFAULT dark:text-success-light font-bold">The feature is releasing soon, please check the about section to know more.</p>
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-center text-xs text-slate-500 dark:text-slate-400 mt-6">
+                Please refer to the complete privacy_policy.txt file in our root repository for all legal disclosures.
+            </div>
+        </div>
+    );
+
     return (
         <>
             <motion.div
@@ -132,6 +181,8 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
                         { label: 'Responder Settings', icon: UserCog, color: 'text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30' },
                         { label: 'Alert Preferences', icon: Bell, color: 'text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30' },
                         { label: 'App Settings', icon: Settings, color: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800' },
+                        { label: 'About MedEm', icon: Info, color: 'text-sky-500 bg-sky-50 dark:bg-sky-900/30' },
+                        { label: 'Privacy Policy', icon: Shield, color: 'text-purple-500 bg-purple-50 dark:bg-purple-900/30' },
                         { label: 'Account Settings', icon: ShieldAlert, color: 'text-danger-500 bg-danger-50 dark:bg-danger-900/30' },
                         {
                             label: `Theme: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`,
@@ -173,6 +224,8 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
                 {activePage === 'Responder Settings' && <SettingsSubView title="Responder Profile" onBack={() => setActivePage(null)}>{renderResponderSettings()}</SettingsSubView>}
                 {activePage === 'Alert Preferences' && <SettingsSubView title="Notifications" onBack={() => setActivePage(null)}>{renderAlertPreferences()}</SettingsSubView>}
                 {activePage === 'App Settings' && <SettingsSubView title="App Settings" onBack={() => setActivePage(null)}>{renderAppSettings()}</SettingsSubView>}
+                {activePage === 'About MedEm' && <SettingsSubView title="About MedEm" onBack={() => setActivePage(null)}>{renderAboutMedEm()}</SettingsSubView>}
+                {activePage === 'Privacy Policy' && <SettingsSubView title="Privacy Policy" onBack={() => setActivePage(null)}>{renderPrivacyPolicy()}</SettingsSubView>}
                 {activePage === 'Account Settings' && <SettingsSubView title="Account Settings" onBack={() => setActivePage(null)}>{renderAccountSettings()}</SettingsSubView>}
             </AnimatePresence>
         </>
