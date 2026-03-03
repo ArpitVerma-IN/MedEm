@@ -6,6 +6,9 @@
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion/)
+[![Lucide React](https://img.shields.io/badge/Lucide_React-FFB21C?style=for-the-badge&logo=lucide&logoColor=black)](https://lucide.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Socket.IO](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white)](https://socket.io/)
 
@@ -19,7 +22,7 @@
 
 **MedEm** is an advanced minimum viable prototype for evaluating live-tracking infrastructure in large-scale medical applications. 
 
-By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it enables multiple remote users (Doctors and Patients) to stream their exact cross-global coordinates securely onto a dynamic leaflet map in real-time. Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely independent, mobile-first responsive dashboards tailored explicitly for Patients and Responders using Tailwind CSS and Framer Motion.
+By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it enables multiple remote users (Doctors and Patients) to stream their exact cross-global coordinates securely onto a dynamic leaflet map in real-time. Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely independent, mobile-first responsive dashboards tailored explicitly for Patients and Responders using Tailwind CSS v4 and Framer Motion. This major update introduced persistent guest authentication, interactive sub-settings views, dynamic system dark/light theming, modular code-splitting for optimal performance, and foundational tracking map enhancements.
 
 ---
 
@@ -140,3 +143,16 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
 | **2** | **Secure Data Layer** | Implement OAuth logins, secure isolated databases, and hardened API architecture. |
 | **3** | **AI Integration** | Automate credential verification and generate critical emergency AI patient summaries. |
 | **4** | **Privacy Controls** | Develop self-service account deletion systems with integrated backend abuse protection. |
+
+---
+
+## 🤝 Contributing & Contact
+
+I actively welcome open-source developers to contribute to this project! If you find MedEm's core mission compelling, feel free to fork this repository, submit Pull Requests, or open Issues for new feature suggestions or bug fixes. Let's build a better, faster, and more robust emergency tracking platform together!
+
+Connect with me using the links below:
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ArpitVerma-IN)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/varpit/)
+[![StackOverflow](https://img.shields.io/badge/Stack_Overflow-FE7A16?style=for-the-badge&logo=stack-overflow&logoColor=white)](https://stackoverflow.com/users/22130957/varpit)
+[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:red.litmus214@passinbox.com)

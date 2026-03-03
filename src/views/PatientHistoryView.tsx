@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { LocateFixed, Clock } from 'lucide-react';
+import { LocateFixed, Clock, AlertTriangle } from 'lucide-react';
 
 export const HistoryView = () => {
     return (
@@ -10,6 +10,16 @@ export const HistoryView = () => {
             className="flex-1 overflow-y-auto px-4 py-6 bg-gray-50 dark:bg-gray-950 pb-24"
         >
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Tracking History</h2>
+
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-6">
+                <p className="text-sm text-amber-800 dark:text-amber-300 font-bold flex items-center gap-2">
+                    <AlertTriangle size={18} />
+                    Under Development
+                </p>
+                <p className="text-xs text-amber-700/80 dark:text-amber-300/80 mt-1 font-medium">
+                    This feature is releasing soon. Please check the About section in your Profile to know more.
+                </p>
+            </div>
 
             <div className="space-y-4">
                 {[1, 2, 3].map((item) => (
