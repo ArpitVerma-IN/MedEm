@@ -11,7 +11,7 @@
 [![Lucide React](https://img.shields.io/badge/Lucide_React-FFB21C?style=for-the-badge&logo=lucide&logoColor=black)](https://lucide.dev/)
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Socket.IO](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white)](https://socket.io/)
-[![Crypto-JS](https://img.shields.io/badge/Crypto--JS-000000?style=for-the-badge&logo=javascript&logoColor=white)](https://github.com/brix/crypto-js)
+[![Web Crypto API](https://img.shields.io/badge/Web_Crypto_API-000000?style=for-the-badge&logo=w3c&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API)
 
 *An interactive, low-latency live map to track and direct emergency responders directly to patients in need.*
 
@@ -38,7 +38,7 @@ By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it e
 - **Dynamic Alerts:** If a Patient securely declares they `"need medical care!"` and actively enters a **500-meter radius** of a logged-in Doctor, the Doctor's dashboard triggers an emergency state—deploying red banners and aggressively pulsating map markers to draw direct attention to the patient's coordinates.
 - **Targeted Rescue Mode:** Doctors can triage patients. By accepting to assist a specific patient from their targeting UI, the system engages *only* that patient. It displays a live decreasing Approach Distance (`e.g., Tracking: 240 m`) for the Doctor, while broadcasting a private `A Doctor is on the way!` slide-up banner to the Patient.
 ### 🔒 AES-256 End-to-End Encryption (E2EE)
-- **Private Medical Communications:** MedEm secures all real-time messaging between victims and responders using `CryptoJS` Advanced Encryption Standard (AES) over the WebSocket layer. Messages are cryptographically converted into unreadable ciphertext on the client device before they even hit the server, ensuring privacy and HIPAA-aligned communication protocols. The server operates identically as a blind relay.
+- **Private Medical Communications:** MedEm secures all real-time messaging between victims and responders utilizing the native browser `Web Crypto API` (AES-GCM) over the WebSocket layer. Messages are cryptographically converted into unreadable ciphertext securely within the device memory before they even hit the server, ensuring privacy and HIPAA-aligned communication protocols. The backend operates identically as a blind relay.
 
 ### 🌐 Tripartite Elastic Map Elements
 - **Mobile Real-Estate Constraints:** The live Map transitions seamlessly through three states (*Collapsed*, *Mini-Modal*, and *Fullscreen*). It features newly rebuilt layout logic mapping independent Dark Mode/Light Mode toggles directly to CartoDB vector endpoints, minimizing visual strain in nighttime environments.
@@ -47,7 +47,7 @@ By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it e
 - **Frontend Framework:** React 19 + TypeScript (Powered by Vite)
 - **Aesthetic System:** Tailwind CSS v4 + Framer Motion + Lucide-React SVGs
 - **Live Connection Layer:** Socket.IO / WebSockets (Client & Server)
-- **Security:** CryptoJS (AES Encryption)
+- **Security:** Native Web Crypto API (AES-GCM Encryption)
 - **Cartography Engine:** React-Leaflet + Leaflet.js
 - **Backend Infrastructure:** Express server running dynamically on Node.js
 
