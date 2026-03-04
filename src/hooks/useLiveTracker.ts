@@ -1,13 +1,44 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import L from 'leaflet';
-import CryptoJS from 'crypto-js';
 import type { User, Location as UserLocation, ChatMessage } from '../types';
 
-// A shared secret for End-to-End Encryption of messages
-// In a production environment, this should be negotiated dynamically via Diffie-Hellman or stored securely
+// Web Crypto API Setup for AES-GCM End-to-End Encryption
 const ENCRYPTION_SECRET = "medem-secure-e2ee-secret-key-2026";
+const getFixedKey = async () => {
+    const enc = new TextEncoder();
+    const keyMaterial = enc.encode(ENCRYPTION_SECRET.padEnd(32, '0').slice(0, 32));
+    return await window.crypto.subtle.importKey(
+        "raw",
+        keyMaterial,
+        { name: "AES-GCM" },
+        false,
+        ["encrypt", "decrypt"]
+    );
+};
 
+// Utility to convert ArrayBuffer to Base64
+const bufferToBase64 = (buffer: ArrayBuffer) => {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+};
+
+// Utility to convert Base64 to ArrayBuffer
+const base64ToBuffer = (base64: string) => {
+    const binary_string = window.atob(base64);
+    const len = binary_string.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
+};
+
+// Web Crypto API Setup for AES-GCM End-to-End Encryption
 interface UseLiveTrackerProps {
     name: string;
     userType: 'Doctor' | 'Patient';
@@ -85,11 +116,20 @@ export const useLiveTracker = ({
             });
         });
 
-        newSocket.on('receive_message', (data: { senderId: string, payload: string, timestamp: string }) => {
+        newSocket.on('receive_message', async (data: { senderId: string, payload: { ciphertext: string, iv: string }, timestamp: string }) => {
             try {
-                // Decrypt the payload
-                const bytes = CryptoJS.AES.decrypt(data.payload, ENCRYPTION_SECRET);
-                const decryptedMessage = bytes.toString(CryptoJS.enc.Utf8);
+                const key = await getFixedKey();
+                const decryptedBuffer = await window.crypto.subtle.decrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: new Uint8Array(base64ToBuffer(data.payload.iv))
+                    },
+                    key,
+                    base64ToBuffer(data.payload.ciphertext)
+                );
+
+                const dec = new TextDecoder();
+                const decryptedMessage = dec.decode(decryptedBuffer);
 
                 if (decryptedMessage) {
                     setMessages(prev => [...prev, {
@@ -99,7 +139,7 @@ export const useLiveTracker = ({
                     }]);
                 }
             } catch (err) {
-                console.error("Failed to decrypt secure message", err);
+                console.error("Failed to decrypt secure message (WebCrypto)", err);
             }
         });
 
@@ -205,14 +245,33 @@ export const useLiveTracker = ({
         }
     }, [isAcceptingHelp, needsCare, acceptingPatientId, socket, isJoined]);
 
-    const sendMessage = (targetId: string, message: string) => {
+    const sendMessage = async (targetId: string, message: string) => {
         if (socket && isJoined) {
-            // Encrypt the message payload before sending over the socket
-            const encryptedPayload = CryptoJS.AES.encrypt(message, ENCRYPTION_SECRET).toString();
+            try {
+                const enc = new TextEncoder();
+                const key = await getFixedKey();
+                const iv = window.crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV for AES-GCM
 
-            const msgObj: ChatMessage = { senderId: 'me', message, timestamp: new Date().toISOString() };
-            socket.emit('send_message', { targetId, payload: encryptedPayload });
-            setMessages(prev => [...prev, msgObj]);
+                const encryptedBuffer = await window.crypto.subtle.encrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: iv
+                    },
+                    key,
+                    enc.encode(message)
+                );
+
+                const encryptedPayload = {
+                    ciphertext: bufferToBase64(encryptedBuffer),
+                    iv: bufferToBase64(iv.buffer)
+                };
+
+                const msgObj: ChatMessage = { senderId: 'me', message, timestamp: new Date().toISOString() };
+                socket.emit('send_message', { targetId, payload: encryptedPayload });
+                setMessages(prev => [...prev, msgObj]);
+            } catch (err) {
+                console.error("Encryption failed:", err);
+            }
         }
     };
 
