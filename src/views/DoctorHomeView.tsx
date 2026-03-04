@@ -37,6 +37,7 @@ export const DoctorHomeView = ({
 
     const [msgInput, setMsgInput] = useState('');
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const [hasUnread, setHasUnread] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Auto-scroll chat
@@ -58,6 +59,23 @@ export const DoctorHomeView = ({
 
     // Filter relevant messages
     const chatMessages = messages.filter(m => m.senderId === 'me' || m.senderId === acceptingPatientId);
+
+    // Unread logic
+    useEffect(() => {
+        if (chatMessages.length > 0) {
+            const lastMsg = chatMessages[chatMessages.length - 1];
+            if (lastMsg.senderId !== 'me' && !isChatOpen) {
+                setHasUnread(true);
+            }
+        }
+    }, [chatMessages, isChatOpen]);
+
+    useEffect(() => {
+        if (isChatOpen) {
+            setHasUnread(false);
+        }
+    }, [isChatOpen]);
+
     // If no target accepted, close chat
     useEffect(() => {
         if (!acceptingPatientId) setIsChatOpen(false);
@@ -117,6 +135,9 @@ export const DoctorHomeView = ({
                                         className="bg-slate-100 dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-slate-600 p-2 rounded-full transition-colors relative"
                                     >
                                         <MessageCircle size={20} />
+                                        {hasUnread && !isChatOpen && (
+                                            <span className="absolute top-0 right-0 w-3 h-3 bg-danger-DEFAULT border-2 border-slate-100 dark:border-slate-800 rounded-full animate-pulse"></span>
+                                        )}
                                     </button>
                                 )}
                             </div>

@@ -188,7 +188,7 @@ export const useLiveTracker = ({
 
     const sendMessage = (targetId: string, message: string) => {
         if (socket && isJoined) {
-            const msgObj: ChatMessage = { senderId: socket.id || 'me', message, timestamp: new Date().toISOString() };
+            const msgObj: ChatMessage = { senderId: 'me', message, timestamp: new Date().toISOString() };
             socket.emit('send_message', { targetId, message });
             setMessages(prev => [...prev, msgObj]);
         }

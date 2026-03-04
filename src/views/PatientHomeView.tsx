@@ -36,6 +36,7 @@ export const PatientHomeView = ({
     const [isTimeout, setIsTimeout] = useState(false);
     const [msgInput, setMsgInput] = useState('');
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const [hasUnread, setHasUnread] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Timeout Logic
@@ -73,6 +74,22 @@ export const PatientHomeView = ({
     // Filter relevant messages
     const activeDoctorId = incomingDoctors.length > 0 ? incomingDoctors[0].user.id : null;
     const chatMessages = messages.filter(m => m.senderId === 'me' || m.senderId === activeDoctorId);
+
+    // Unread logic
+    useEffect(() => {
+        if (chatMessages.length > 0) {
+            const lastMsg = chatMessages[chatMessages.length - 1];
+            if (lastMsg.senderId !== 'me' && !isChatOpen) {
+                setHasUnread(true);
+            }
+        }
+    }, [chatMessages, isChatOpen]);
+
+    useEffect(() => {
+        if (isChatOpen) {
+            setHasUnread(false);
+        }
+    }, [isChatOpen]);
 
     const isConnecting = needsCare && incomingDoctors.length === 0 && !isTimeout;
     const isTimeoutReached = needsCare && incomingDoctors.length === 0 && isTimeout;
@@ -215,9 +232,12 @@ export const PatientHomeView = ({
                             </div>
                             <button
                                 onClick={() => setIsChatOpen(!isChatOpen)}
-                                className="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors"
+                                className="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors relative"
                             >
                                 <MessageCircle size={20} />
+                                {hasUnread && !isChatOpen && (
+                                    <span className="absolute top-0 right-0 w-3 h-3 bg-danger-DEFAULT border-2 border-success-DEFAULT dark:border-success-dark rounded-full animate-pulse"></span>
+                                )}
                             </button>
                         </div>
 
