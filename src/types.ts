@@ -13,3 +13,9 @@ export interface User {
     isAcceptingHelp?: boolean;
     acceptingPatientId?: string | null;
 }
+
+export interface ChatMessage {
+    senderId: string;
+    message: string;
+    timestamp: string;
+}

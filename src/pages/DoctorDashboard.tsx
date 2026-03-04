@@ -32,6 +32,8 @@ export const DoctorDashboard = () => {
         users,
         nearbyPatients,
         incomingDoctors,
+        messages,
+        sendMessage,
         triggerJoin,
         setMyLocation
     } = useLiveTracker({
@@ -95,6 +97,8 @@ export const DoctorDashboard = () => {
                             acceptingPatientId={acceptingPatientId}
                             setAcceptingPatientId={setAcceptingPatientId}
                             setIsAcceptingHelp={setIsAcceptingHelp}
+                            messages={messages}
+                            sendMessage={sendMessage}
                             centerMapToMe={centerMapToMe}
                         />
                     )}

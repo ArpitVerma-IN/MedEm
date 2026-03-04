@@ -1,7 +1,9 @@
-import { Locate, AlertTriangle, Activity } from 'lucide-react';
+import { Locate, AlertTriangle, Activity, Send, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
 import { LiveTrackingMap } from '../components/LiveTrackingMap';
-import type { User, Location as UserLocation } from '../types';
+import clsx from 'clsx';
+import type { User, Location as UserLocation, ChatMessage } from '../types';
 
 interface DoctorHomeViewProps {
     name: string;
@@ -13,6 +15,8 @@ interface DoctorHomeViewProps {
     acceptingPatientId: string | null;
     setIsAcceptingHelp: (val: boolean) => void;
     setAcceptingPatientId: (id: string | null) => void;
+    messages: ChatMessage[];
+    sendMessage: (targetId: string, message: string) => void;
     centerMapToMe: () => void;
 }
 
@@ -26,10 +30,38 @@ export const DoctorHomeView = ({
     acceptingPatientId,
     setIsAcceptingHelp,
     setAcceptingPatientId,
+    messages,
+    sendMessage,
     centerMapToMe
 }: DoctorHomeViewProps) => {
 
+    const [msgInput, setMsgInput] = useState('');
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    // Auto-scroll chat
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages, isChatOpen]);
+
     const formatDist = (m: number) => m > 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
+
+    const handleSendMsg = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (msgInput.trim() && acceptingPatientId) {
+            sendMessage(acceptingPatientId, msgInput);
+            setMsgInput('');
+        }
+    };
+
+    // Filter relevant messages
+    const chatMessages = messages.filter(m => m.senderId === 'me' || m.senderId === acceptingPatientId);
+    // If no target accepted, close chat
+    useEffect(() => {
+        if (!acceptingPatientId) setIsChatOpen(false);
+    }, [acceptingPatientId]);
 
     return (
         <motion.div
@@ -72,11 +104,21 @@ export const DoctorHomeView = ({
                         >
                             <div className="absolute top-0 left-0 w-1 h-full bg-danger-DEFAULT animate-pulse"></div>
 
-                            <div className="flex items-center gap-2 mb-3 px-2">
-                                <AlertTriangle className="text-danger-DEFAULT animate-bounce drop-shadow" size={20} />
-                                <span className="text-sm font-extrabold text-slate-800 dark:text-slate-100 tracking-wide">
-                                    {nearbyPatients.length} EMERGENCY {nearbyPatients.length === 1 ? 'SIGNAL' : 'SIGNALS'}
-                                </span>
+                            <div className="flex items-center justify-between mb-3 px-2">
+                                <div className="flex items-center gap-2">
+                                    <AlertTriangle className="text-danger-DEFAULT animate-bounce drop-shadow" size={20} />
+                                    <span className="text-sm font-extrabold text-slate-800 dark:text-slate-100 tracking-wide">
+                                        {nearbyPatients.length} EMERGENCY {nearbyPatients.length === 1 ? 'SIGNAL' : 'SIGNALS'}
+                                    </span>
+                                </div>
+                                {acceptingPatientId && (
+                                    <button
+                                        onClick={() => setIsChatOpen(!isChatOpen)}
+                                        className="bg-slate-100 dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-slate-600 p-2 rounded-full transition-colors relative"
+                                    >
+                                        <MessageCircle size={20} />
+                                    </button>
+                                )}
                             </div>
 
                             <div className="flex flex-col gap-2">
@@ -119,6 +161,43 @@ export const DoctorHomeView = ({
                                         </span>
                                     </motion.div>
                                 )}
+
+                                {/* Expandable Chat Area */}
+                                {isChatOpen && acceptingPatientId && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        className="bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-700/80 rounded-xl p-3 mt-2 flex flex-col gap-3 relative z-10 h-48"
+                                    >
+                                        <div className="flex-1 overflow-y-auto pr-2 space-y-2 text-sm flex flex-col">
+                                            {chatMessages.length === 0 ? (
+                                                <div className="text-slate-500 text-center text-xs italic my-auto">
+                                                    Send a reassurement message to the patient.
+                                                </div>
+                                            ) : (
+                                                chatMessages.map((msg, i) => (
+                                                    <div key={i} className={clsx("flex flex-col max-w-[85%] rounded-lg p-2", msg.senderId === 'me' ? 'self-end bg-emerald-100 text-emerald-900 dark:bg-emerald-900 dark:text-emerald-100 items-end' : 'self-start bg-white border border-slate-200 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200 items-start')}>
+                                                        <span className="font-medium text-[13px]">{msg.message}</span>
+                                                    </div>
+                                                ))
+                                            )}
+                                            <div ref={messagesEndRef} />
+                                        </div>
+                                        <form onSubmit={handleSendMsg} className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                value={msgInput}
+                                                onChange={e => setMsgInput(e.target.value)}
+                                                placeholder="Quick message..."
+                                                className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 rounded-lg px-3 py-2 text-sm outline-none border border-slate-200 dark:border-slate-600 focus:border-emerald-500 transition-colors"
+                                            />
+                                            <button type="submit" disabled={!msgInput.trim()} className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-600 text-white p-2 rounded-lg transition-colors">
+                                                <Send size={16} />
+                                            </button>
+                                        </form>
+                                    </motion.div>
+                                )}
+
                             </div>
                         </motion.div>
                     )}

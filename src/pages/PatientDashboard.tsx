@@ -32,6 +32,8 @@ export const PatientDashboard = () => {
         users,
         nearbyPatients,
         incomingDoctors,
+        messages,
+        sendMessage,
         triggerJoin,
         setMyLocation
     } = useLiveTracker({
@@ -92,6 +94,8 @@ export const PatientDashboard = () => {
                             nearbyPatients={nearbyPatients}
                             needsCare={needsCare}
                             setNeedsCare={setNeedsCare}
+                            messages={messages}
+                            sendMessage={sendMessage}
                             centerMapToMe={centerMapToMe}
                         />
                     )}

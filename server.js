@@ -59,6 +59,16 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('send_message', (data) => {
+    if (data.targetId) {
+      io.to(data.targetId).emit('receive_message', {
+        senderId: socket.id,
+        message: data.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);
     users.delete(socket.id);

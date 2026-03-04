@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import L from 'leaflet';
-import type { User, Location as UserLocation } from '../types';
+import type { User, Location as UserLocation, ChatMessage } from '../types';
 
 interface UseLiveTrackerProps {
     name: string;
@@ -31,6 +31,7 @@ export const useLiveTracker = ({
     const [users, setUsers] = useState<Map<string, User>>(new Map());
     const [nearbyPatients, setNearbyPatients] = useState<{ user: User, distance: number }[]>([]);
     const [incomingDoctors, setIncomingDoctors] = useState<{ user: User, distance: number }[]>([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const watchId = useRef<number | null>(null);
 
     const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId });
@@ -77,6 +78,10 @@ export const useLiveTracker = ({
                 next.delete(id);
                 return next;
             });
+        });
+
+        newSocket.on('receive_message', (data: ChatMessage) => {
+            setMessages(prev => [...prev, data]);
         });
 
         newSocket.on('connect', () => {
@@ -181,12 +186,22 @@ export const useLiveTracker = ({
         }
     }, [isAcceptingHelp, needsCare, acceptingPatientId, socket, isJoined]);
 
+    const sendMessage = (targetId: string, message: string) => {
+        if (socket && isJoined) {
+            const msgObj: ChatMessage = { senderId: socket.id || 'me', message, timestamp: new Date().toISOString() };
+            socket.emit('send_message', { targetId, message });
+            setMessages(prev => [...prev, msgObj]);
+        }
+    };
+
     return {
         socket,
         myLocation,
         users,
         nearbyPatients,
         incomingDoctors,
+        messages,
+        sendMessage,
         triggerJoin,
         setMyLocation
     };
