@@ -13,7 +13,7 @@ export const AppSettings = () => (
                 <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Precise Location Tracking</span>
                 <span className="text-xs text-slate-500 font-medium mt-0.5">Allow MedEm to trace location pings</span>
             </div>
-            <input type="checkbox" defaultChecked className="w-5 h-5 accent-med-DEFAULT cursor-pointer" />
+            <input type="checkbox" defaultChecked className="w-5 h-5 accent-med cursor-pointer" />
         </div>
     </div>
 );

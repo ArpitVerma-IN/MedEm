@@ -23,7 +23,7 @@ export const BottomNav = ({ activeTab, onChange, userType }: BottomNavProps) => 
     // Specific accent coloring based on role and tab
     const getTabColor = (isActive: boolean) => {
         if (!isActive) return 'text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400';
-        return userType === 'Patient' ? 'text-med-DEFAULT' : 'text-success-DEFAULT';
+        return userType === 'Patient' ? 'text-med' : 'text-success';
     };
 
     return (
@@ -49,7 +49,7 @@ export const BottomNav = ({ activeTab, onChange, userType }: BottomNavProps) => 
                                         layoutId="activeTabIndicator"
                                         className={clsx(
                                             "absolute -bottom-2 w-1 h-1 rounded-full left-1/2 -translate-x-1/2",
-                                            userType === 'Patient' ? 'bg-med-DEFAULT' : 'bg-success-DEFAULT'
+                                            userType === 'Patient' ? 'bg-med' : 'bg-success'
                                         )}
                                     />
                                 )}

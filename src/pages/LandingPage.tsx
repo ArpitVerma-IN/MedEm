@@ -40,8 +40,8 @@ export const LandingPage = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-4 relative font-inter overflow-hidden">
             {/* Background Accents */}
-            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-med-DEFAULT/10 dark:bg-med-DEFAULT/5 blur-3xl rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-success-DEFAULT/10 dark:bg-success-dark/10 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-med/10 dark:bg-med/5 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-success/10 dark:bg-success-dark/10 blur-3xl rounded-full pointer-events-none" />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -50,11 +50,11 @@ export const LandingPage = () => {
             >
                 {/* Logo & Headline */}
                 <div className="flex flex-col items-center mb-2">
-                    <div className="w-20 h-20 bg-med-100 dark:bg-med-900/40 text-med-DEFAULT dark:text-med-light rounded-[24px] flex items-center justify-center shadow-inner border border-med-200 dark:border-med-DEFAULT/20 mb-6 relative overflow-hidden">
+                    <div className="w-20 h-20 bg-med-100 dark:bg-med-900/40 text-med dark:text-med-light rounded-[24px] flex items-center justify-center shadow-inner border border-med-200 dark:border-med/20 mb-6 relative overflow-hidden">
                         <Map size={36} strokeWidth={2.5} className="relative z-10" />
                         <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/10 dark:to-transparent" />
                     </div>
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">Med<span className="text-med-DEFAULT">Em</span></h1>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">Med<span className="text-med">Em</span></h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed px-4">Instant connection to the emergency responder network.</p>
                 </div>
 
@@ -110,7 +110,7 @@ export const LandingPage = () => {
                             <form onSubmit={handleJoin} className="flex flex-col gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800/50">
                                 <input
                                     type="text"
-                                    className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-sm font-semibold placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-med-DEFAULT focus:ring-2 focus:ring-med-DEFAULT/20 transition-all"
+                                    className="w-full px-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white text-sm font-semibold placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-med focus:ring-2 focus:ring-med/20 transition-all"
                                     placeholder="Enter your name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -123,14 +123,14 @@ export const LandingPage = () => {
                                     <button
                                         type="button"
                                         onClick={() => setUserType('Patient')}
-                                        className={`flex-1 flex items-center justify-center py-2.5 text-sm font-bold rounded-lg transition-all ${userType === 'Patient' ? 'bg-white dark:bg-slate-700 text-med-DEFAULT shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                        className={`flex-1 flex items-center justify-center py-2.5 text-sm font-bold rounded-lg transition-all ${userType === 'Patient' ? 'bg-white dark:bg-slate-700 text-med shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                     >
                                         Patient
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setUserType('Doctor')}
-                                        className={`flex-1 flex items-center justify-center py-2.5 text-sm font-bold rounded-lg transition-all ${userType === 'Doctor' ? 'bg-white dark:bg-slate-700 text-success-DEFAULT shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                                        className={`flex-1 flex items-center justify-center py-2.5 text-sm font-bold rounded-lg transition-all ${userType === 'Doctor' ? 'bg-white dark:bg-slate-700 text-success shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                     >
                                         Responder
                                     </button>
@@ -138,7 +138,7 @@ export const LandingPage = () => {
 
                                 <button
                                     type="submit"
-                                    className="mt-1 w-full bg-med-DEFAULT hover:bg-med-dark text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-med-DEFAULT/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="mt-1 w-full bg-med hover:bg-med-dark text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-med/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                                     disabled={!name.trim()}
                                 >
                                     Enter Network

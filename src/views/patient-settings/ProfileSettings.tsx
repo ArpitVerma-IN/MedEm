@@ -18,6 +18,6 @@ export const ProfileSettings = ({ name }: { name: string }) => (
                 <option>AB+</option><option>AB-</option>
             </select>
         </div>
-        <button className="w-full bg-med-DEFAULT text-white font-bold py-3.5 rounded-xl hover:bg-med-dark transition-colors active:scale-95 shadow-md">Save Changes</button>
+        <button className="w-full bg-med text-white font-bold py-3.5 rounded-xl hover:bg-med-dark transition-colors active:scale-95 shadow-md">Save Changes</button>
     </div>
 );

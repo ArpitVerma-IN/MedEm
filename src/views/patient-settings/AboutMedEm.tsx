@@ -3,7 +3,7 @@ import { Info } from 'lucide-react';
 export const AboutMedEm = () => (
     <div className="space-y-6">
         <div className="flex flex-col items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-med-100 dark:bg-med-900/40 text-med-DEFAULT dark:text-med-light rounded-[20px] flex items-center justify-center shadow-inner border border-med-200 dark:border-med-DEFAULT/20 mb-4">
+            <div className="w-16 h-16 bg-med-100 dark:bg-med-900/40 text-med dark:text-med-light rounded-[20px] flex items-center justify-center shadow-inner border border-med-200 dark:border-med/20 mb-4">
                 <Info size={32} strokeWidth={2.5} />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">About MedEm</h3>
@@ -25,7 +25,7 @@ export const AboutMedEm = () => (
         </div>
 
         <div className="flex justify-center mt-8">
-            <a href="https://github.com/ArpitVerma-IN/MedEm" target="_blank" rel="noopener noreferrer" className="text-med-DEFAULT hover:text-med-dark dark:text-med-light dark:hover:text-white text-sm font-bold flex items-center gap-2 transition-colors">
+            <a href="https://github.com/ArpitVerma-IN/MedEm" target="_blank" rel="noopener noreferrer" className="text-med hover:text-med-dark dark:text-med-light dark:hover:text-white text-sm font-bold flex items-center gap-2 transition-colors">
                 View Project on GitHub
             </a>
         </div>

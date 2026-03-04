@@ -25,7 +25,7 @@ export const DoctorHistoryView = () => {
                 {[1, 2, 3].map((item) => (
                     <div key={item} className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700 flex items-start gap-4 hover:shadow-md transition-shadow">
                         <div className="bg-success-100 dark:bg-success-900/40 p-3 rounded-full flex-shrink-0 border border-success-200 dark:border-success-800">
-                            <LocateFixed className="text-success-DEFAULT dark:text-success-light" size={20} />
+                            <LocateFixed className="text-success dark:text-success-light" size={20} />
                         </div>
                         <div className="flex-1">
                             <h4 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Responded to SOS</h4>

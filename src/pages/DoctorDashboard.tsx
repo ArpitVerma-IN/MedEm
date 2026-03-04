@@ -70,9 +70,9 @@ export const DoctorDashboard = () => {
         return (
             <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm p-4">
                 <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[24px] p-8 shadow-2xl border border-white/10 text-center">
-                    <h2 className="text-2xl font-bold text-danger-DEFAULT mb-2">Connection Error</h2>
+                    <h2 className="text-2xl font-bold text-danger mb-2">Connection Error</h2>
                     <p className="text-slate-600 dark:text-slate-400 mb-6 font-medium">{error}</p>
-                    <button className="w-full bg-danger-DEFAULT hover:bg-danger-dark text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98]" onClick={() => navigate('/')}>
+                    <button className="w-full bg-danger hover:bg-danger-dark text-white font-bold py-3.5 rounded-xl transition-all shadow-md active:scale-[0.98]" onClick={() => navigate('/')}>
                         Go Back
                     </button>
                 </div>

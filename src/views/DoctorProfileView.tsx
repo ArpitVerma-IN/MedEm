@@ -35,13 +35,13 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
             >
                 <div className="flex flex-col items-center justify-center mb-8 pt-4">
                     <div className="w-24 h-24 rounded-[28px] bg-success-100 dark:bg-success-900/40 flex items-center justify-center shadow-md border-4 border-white dark:border-slate-800 mb-4">
-                        <span className="text-4xl font-extrabold text-success-DEFAULT dark:text-success-light">
+                        <span className="text-4xl font-extrabold text-success dark:text-success-light">
                             {name.charAt(0).toUpperCase()}
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Dr. {name}</h2>
-                        <FileCheck size={20} className="text-success-DEFAULT" />
+                        <FileCheck size={20} className="text-success" />
                     </div>
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Verified Responder</p>
                     <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-2">dr.{name.toLowerCase()}@medem.com</p>
@@ -49,7 +49,7 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
 
                 <div className="space-y-3 mb-8">
                     {[
-                        { label: 'Upload Medical Certifications', icon: FileCheck, color: 'text-success-DEFAULT dark:text-success-light bg-success-50 dark:bg-success-900/30' },
+                        { label: 'Upload Medical Certifications', icon: FileCheck, color: 'text-success dark:text-success-light bg-success-50 dark:bg-success-900/30' },
                         { label: 'Responder Settings', icon: UserCog, color: 'text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30' },
                         { label: 'Alert Preferences', icon: Bell, color: 'text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30' },
                         { label: 'App Settings', icon: Settings, color: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800' },
@@ -84,7 +84,7 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
 
                 <button
                     onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-2 p-4 bg-danger-50 dark:bg-danger-900/20 rounded-2xl border border-danger-200 dark:border-danger-800 text-danger-DEFAULT dark:text-danger-light hover:bg-danger-100 dark:hover:bg-danger-900/40 transition-colors shadow-sm"
+                    className="w-full flex items-center justify-center gap-2 p-4 bg-danger-50 dark:bg-danger-900/20 rounded-2xl border border-danger-200 dark:border-danger-800 text-danger dark:text-danger-light hover:bg-danger-100 dark:hover:bg-danger-900/40 transition-colors shadow-sm"
                 >
                     <LogOut size={20} strokeWidth={2.5} />
                     <span className="font-bold">Log Out</span>

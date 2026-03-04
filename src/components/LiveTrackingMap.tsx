@@ -52,6 +52,7 @@ interface LiveTrackingMapProps {
     incomingDoctors: { user: User, distance: number }[];
     nearbyPatients: { user: User, distance: number }[];
     acceptingPatientId: string | null;
+    fullscreenOverlay?: React.ReactNode;
 }
 
 export const LiveTrackingMap = ({
@@ -63,7 +64,8 @@ export const LiveTrackingMap = ({
     users,
     incomingDoctors,
     nearbyPatients,
-    acceptingPatientId
+    acceptingPatientId,
+    fullscreenOverlay
 }: LiveTrackingMapProps) => {
     type MapState = 'collapsed' | 'mini' | 'large';
     const [mapState, setMapState] = useState<MapState>('collapsed');
@@ -153,7 +155,7 @@ export const LiveTrackingMap = ({
                             onClick={() => setMapState('mini')}
                             className="mt-2 bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 shadow-sm rounded-xl px-6 py-3 font-bold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-95"
                         >
-                            <svg className="w-5 h-5 text-med-DEFAULT" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="w-5 h-5 text-med" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                             </svg>
                             View Live Map
@@ -168,7 +170,7 @@ export const LiveTrackingMap = ({
                         <button onClick={() => setMapState('large')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
                             <Maximize2 size={18} strokeWidth={2.5} />
                         </button>
-                        <button onClick={() => setMapState('collapsed')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-danger-DEFAULT pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
+                        <button onClick={() => setMapState('collapsed')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-danger pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
                             <X size={18} strokeWidth={2.5} />
                         </button>
                     </div>
@@ -200,6 +202,12 @@ export const LiveTrackingMap = ({
                     >
                         {renderMapElements()}
                     </MapContainer>
+
+                    {fullscreenOverlay && (
+                        <div className="absolute bottom-24 left-0 w-full z-[2000] px-6 pointer-events-auto flex justify-center">
+                            {fullscreenOverlay}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

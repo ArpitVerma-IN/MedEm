@@ -25,7 +25,7 @@ export const HistoryView = () => {
                 {[1, 2, 3].map((item) => (
                     <div key={item} className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-800 flex items-start gap-4">
                         <div className="bg-gray-100 dark:bg-gray-800 p-3 rounded-full flex-shrink-0">
-                            <LocateFixed className="text-med-DEFAULT" size={20} />
+                            <LocateFixed className="text-med" size={20} />
                         </div>
                         <div className="flex-1">
                             <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-1">Emergency Call Log</h4>

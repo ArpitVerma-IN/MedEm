@@ -18,6 +18,6 @@ export const ResponderSettings = () => (
                 <option>Region Wide</option>
             </select>
         </div>
-        <button className="w-full bg-success-DEFAULT text-white font-bold py-3.5 rounded-xl hover:bg-success-dark transition-colors active:scale-95 shadow-md">Update Preferences</button>
+        <button className="w-full bg-success text-white font-bold py-3.5 rounded-xl hover:bg-success-dark transition-colors active:scale-95 shadow-md">Update Preferences</button>
     </div>
 );

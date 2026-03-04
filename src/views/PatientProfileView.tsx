@@ -35,7 +35,7 @@ export const ProfileView = ({ name }: { name: string }) => {
             >
                 <div className="flex flex-col items-center justify-center mb-8">
                     <div className="w-24 h-24 rounded-[28px] bg-med-100 dark:bg-med-900/40 flex items-center justify-center shadow-md border-4 border-white dark:border-slate-800 mb-4">
-                        <span className="text-4xl font-extrabold text-med-DEFAULT dark:text-med-light">
+                        <span className="text-4xl font-extrabold text-med dark:text-med-light">
                             {name.charAt(0).toUpperCase()}
                         </span>
                     </div>
@@ -45,7 +45,7 @@ export const ProfileView = ({ name }: { name: string }) => {
 
                 <div className="space-y-3 mb-8">
                     {[
-                        { label: 'Profile Settings', icon: UserCog, color: 'text-med-DEFAULT bg-med-50 dark:bg-med-900/30' },
+                        { label: 'Profile Settings', icon: UserCog, color: 'text-med bg-med-50 dark:bg-med-900/30' },
                         { label: 'Report Upload Options', icon: FileText, color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' },
                         { label: 'Notification Settings', icon: Bell, color: 'text-orange-500 bg-orange-50 dark:bg-orange-900/30' },
                         { label: 'App Settings', icon: Settings, color: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800' },
@@ -80,7 +80,7 @@ export const ProfileView = ({ name }: { name: string }) => {
 
                 <button
                     onClick={handleLogout}
-                    className="w-full flex items-center justify-center gap-2 p-4 bg-danger-50 dark:bg-danger-900/20 rounded-2xl border border-danger-200 dark:border-danger-800 text-danger-DEFAULT dark:text-danger-light hover:bg-danger-100 dark:hover:bg-danger-900/40 transition-colors shadow-sm"
+                    className="w-full flex items-center justify-center gap-2 p-4 bg-danger-50 dark:bg-danger-900/20 rounded-2xl border border-danger-200 dark:border-danger-800 text-danger dark:text-danger-light hover:bg-danger-100 dark:hover:bg-danger-900/40 transition-colors shadow-sm"
                 >
                     <LogOut size={20} strokeWidth={2.5} />
                     <span className="font-bold">Log Out</span>
