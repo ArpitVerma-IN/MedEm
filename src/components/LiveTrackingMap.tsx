@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Maximize2, Minimize2, X, Locate } from 'lucide-react';
+import { Maximize2, Minimize2, X, Locate, Moon, Sun, Navigation, NavigationOff } from 'lucide-react';
 import type { User, Location as UserLocation } from '../types';
 
 // Create a custom hook to center the map on a location with a slight debounce
@@ -72,6 +72,8 @@ export const LiveTrackingMap = ({
 }: LiveTrackingMapProps) => {
     type MapState = 'collapsed' | 'mini' | 'large';
     const [mapState, setMapState] = useState<MapState>('collapsed');
+    const [isMapDark, setIsMapDark] = useState(false);
+    const [isNavEnabled, setIsNavEnabled] = useState(false);
 
     const defaultCenter: [number, number] = useMemo(() => {
         return myLocation ? [myLocation.lat, myLocation.lng] : [51.505, -0.09];
@@ -83,7 +85,9 @@ export const LiveTrackingMap = ({
         <>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                url={isMapDark
+                    ? "https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png"
+                    : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"}
             />
 
             {myLocation && <MapController center={[myLocation.lat, myLocation.lng]} />}
@@ -176,6 +180,12 @@ export const LiveTrackingMap = ({
                         <button onClick={() => setMapState('collapsed')} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-danger pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600">
                             <X size={18} strokeWidth={2.5} />
                         </button>
+                        <button onClick={() => setIsMapDark(!isMapDark)} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600 mt-2">
+                            {isMapDark ? <Sun size={18} strokeWidth={2.5} className="text-amber-500" /> : <Moon size={18} strokeWidth={2.5} />}
+                        </button>
+                        <button onClick={() => setIsNavEnabled(!isNavEnabled)} className={`bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600 ${isNavEnabled ? 'text-med' : 'text-slate-400 dark:text-slate-500'}`}>
+                            {isNavEnabled ? <Navigation size={18} strokeWidth={2.5} /> : <NavigationOff size={18} strokeWidth={2.5} />}
+                        </button>
                     </div>
                     <div className="flex-1 w-full h-full relative z-0">
                         <MapContainer
@@ -197,10 +207,16 @@ export const LiveTrackingMap = ({
                             <Minimize2 size={24} strokeWidth={2.5} />
                         </button>
                         {centerMapToMe && (
-                            <button onClick={centerMapToMe} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-med cursor-pointer">
+                            <button onClick={centerMapToMe} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-med cursor-pointer mb-2">
                                 <Locate strokeWidth={2.5} size={24} />
                             </button>
                         )}
+                        <button onClick={() => setIsMapDark(!isMapDark)} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 cursor-pointer">
+                            {isMapDark ? <Sun size={24} strokeWidth={2.5} className="text-amber-500" /> : <Moon size={24} strokeWidth={2.5} />}
+                        </button>
+                        <button onClick={() => setIsNavEnabled(!isNavEnabled)} className={`bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform cursor-pointer ${isNavEnabled ? 'text-med' : 'text-slate-400 dark:text-slate-500'}`}>
+                            {isNavEnabled ? <Navigation size={24} strokeWidth={2.5} /> : <NavigationOff size={24} strokeWidth={2.5} />}
+                        </button>
                     </div>
                     <MapContainer
                         center={defaultCenter}
