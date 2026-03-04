@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
     if (data.targetId) {
       io.to(data.targetId).emit('receive_message', {
         senderId: socket.id,
-        message: data.message,
+        payload: data.payload, // Forward ONLY the encrypted payload block
         timestamp: new Date().toISOString()
       });
     }

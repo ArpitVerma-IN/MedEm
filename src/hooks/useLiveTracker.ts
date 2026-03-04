@@ -1,7 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import L from 'leaflet';
+import CryptoJS from 'crypto-js';
 import type { User, Location as UserLocation, ChatMessage } from '../types';
+
+// A shared secret for End-to-End Encryption of messages
+// In a production environment, this should be negotiated dynamically via Diffie-Hellman or stored securely
+const ENCRYPTION_SECRET = "medem-secure-e2ee-secret-key-2026";
 
 interface UseLiveTrackerProps {
     name: string;
@@ -80,8 +85,22 @@ export const useLiveTracker = ({
             });
         });
 
-        newSocket.on('receive_message', (data: ChatMessage) => {
-            setMessages(prev => [...prev, data]);
+        newSocket.on('receive_message', (data: { senderId: string, payload: string, timestamp: string }) => {
+            try {
+                // Decrypt the payload
+                const bytes = CryptoJS.AES.decrypt(data.payload, ENCRYPTION_SECRET);
+                const decryptedMessage = bytes.toString(CryptoJS.enc.Utf8);
+
+                if (decryptedMessage) {
+                    setMessages(prev => [...prev, {
+                        senderId: data.senderId,
+                        message: decryptedMessage,
+                        timestamp: data.timestamp
+                    }]);
+                }
+            } catch (err) {
+                console.error("Failed to decrypt secure message", err);
+            }
         });
 
         newSocket.on('connect', () => {
@@ -188,8 +207,11 @@ export const useLiveTracker = ({
 
     const sendMessage = (targetId: string, message: string) => {
         if (socket && isJoined) {
+            // Encrypt the message payload before sending over the socket
+            const encryptedPayload = CryptoJS.AES.encrypt(message, ENCRYPTION_SECRET).toString();
+
             const msgObj: ChatMessage = { senderId: 'me', message, timestamp: new Date().toISOString() };
-            socket.emit('send_message', { targetId, message });
+            socket.emit('send_message', { targetId, payload: encryptedPayload });
             setMessages(prev => [...prev, msgObj]);
         }
     };
