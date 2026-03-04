@@ -124,14 +124,14 @@ export const PatientHomeView = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 flex flex-col w-full bg-[#3B3B7A] dark:bg-[#1E1E3F] transition-colors overflow-hidden"
+            className="absolute inset-0 bg-[#3B3B7A] dark:bg-[#1E1E3F] transition-colors overflow-hidden flex flex-col"
         >
-            {/* Top Branded Section - Fixed Background */}
-            <div className="w-full pt-12 pb-16 px-6 flex flex-col text-white shrink-0 relative z-0">
-                <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm font-medium opacity-80 tracking-wide uppercase">MedEm Network</span>
-                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm">
-                        <span className="text-white text-xs font-bold leading-none">{name.charAt(0).toUpperCase()}</span>
+            {/* Fixed Background Brand Layer */}
+            <div className="fixed top-0 left-0 w-full pt-12 px-6 flex flex-col text-white pointer-events-none z-0">
+                <div className="flex items-center justify-between mb-4 pointer-events-auto">
+                    <span className="text-sm font-medium opacity-80 tracking-wide uppercase mt-2">MedEm Network</span>
+                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm mt-2">
+                        <span className="text-white text-xs font-bold leading-none px-1">{name.charAt(0).toUpperCase()}</span>
                     </div>
                 </div>
 
@@ -146,9 +146,10 @@ export const PatientHomeView = ({
                 </div>
             </div>
 
-            {/* Scrollable Bottom Theme Canvas */}
-            <div className="flex-1 w-full relative z-10 -mt-6 overflow-y-auto w-full">
-                <div className="bg-gray-50 dark:bg-gray-900 min-h-full rounded-t-[2.5rem] shadow-[0_-12px_30px_rgb(0,0,0,0.15)] p-6 flex flex-col items-center gap-6 pb-32">
+            {/* Scrollable Overlay Layer */}
+            <div className="absolute inset-0 overflow-y-auto overflow-x-hidden scroll-smooth z-10 pt-[240px] pb-12">
+                {/* Responsive White/Dark Card */}
+                <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-[2.5rem] shadow-[0_-12px_30px_rgb(0,0,0,0.15)] p-6 min-h-[500px] flex flex-col items-center gap-6 relative z-10 pointer-events-auto">
 
                     {/* 1. Interactive Panic Button */}
                     {SOSButton}
@@ -242,7 +243,7 @@ export const PatientHomeView = ({
                                 >
                                     <MessageCircle size={20} />
                                     {hasUnread && !isChatOpen && (
-                                        <span className="absolute top-0 right-0 w-3 h-3 bg-danger border-2 border-success dark:border-success-dark rounded-full animate-pulse"></span>
+                                        <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-green-600 dark:border-green-800 rounded-full animate-pulse"></span>
                                     )}
                                 </button>
                             </div>
@@ -293,6 +294,11 @@ export const PatientHomeView = ({
                         </motion.div>
                     )}
 
+                </div>
+
+                {/* Footer Section revealing the fixed background */}
+                <div className="w-full py-8 mb-6 flex items-center justify-center text-[#C1C1F8] font-medium tracking-wide">
+                    Built with <HeartPulse size={20} className="mx-2 text-red-400 animate-bounce" /> to help
                 </div>
             </div>
         </motion.div>

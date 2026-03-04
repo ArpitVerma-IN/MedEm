@@ -1,4 +1,4 @@
-import { Locate, AlertTriangle, Activity, Send, MessageCircle } from 'lucide-react';
+import { Locate, AlertTriangle, Activity, Send, MessageCircle, HeartPulse } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { LiveTrackingMap } from '../components/LiveTrackingMap';
@@ -86,19 +86,19 @@ export const DoctorHomeView = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 flex flex-col w-full bg-[#064E3B] dark:bg-[#022C22] font-inter overflow-hidden"
+            className="absolute inset-0 bg-[#064E3B] dark:bg-[#022C22] font-inter overflow-hidden flex flex-col"
         >
-            {/* Top Branded Section - Fixed Background */}
-            <div className="w-full pt-12 pb-16 px-6 flex flex-col text-white z-0 relative shrink-0">
-                <div className="flex items-center justify-between mb-4 relative z-10">
-                    <span className="text-xs font-bold opacity-80 tracking-widest uppercase text-emerald-100">Responder Active</span>
-                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm border border-white/10 shadow-sm">
-                        <span className="text-white text-xs font-black leading-none">DR</span>
+            {/* Fixed Background Brand Layer */}
+            <div className="fixed top-0 left-0 w-full pt-12 px-6 flex flex-col text-white pointer-events-none z-0">
+                <div className="flex items-center justify-between mb-4 pointer-events-auto">
+                    <span className="text-xs font-bold opacity-80 tracking-widest uppercase text-emerald-100 mt-2">Responder Active</span>
+                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm border border-white/10 shadow-sm mt-2">
+                        <span className="text-white text-xs font-black leading-none px-1">DR</span>
                     </div>
                 </div>
 
-                <h1 className="text-3xl font-extrabold tracking-tight mb-1 relative z-10 drop-shadow-sm">Dr. {name}</h1>
-                <p className="text-emerald-100/90 font-medium text-[1.05rem] max-w-[260px] leading-relaxed relative z-10">
+                <h1 className="text-3xl font-extrabold tracking-tight mb-1 drop-shadow-sm">Dr. {name}</h1>
+                <p className="text-emerald-100/90 font-medium text-[1.05rem] max-w-[260px] leading-relaxed">
                     Standing by for emergency tracking signals.
                 </p>
 
@@ -108,9 +108,10 @@ export const DoctorHomeView = ({
                 </div>
             </div>
 
-            {/* Scrollable Bottom Theme Canvas */}
-            <div className="flex-1 w-full relative z-10 -mt-6 overflow-y-auto w-full">
-                <div className="bg-slate-50 dark:bg-slate-900 rounded-t-[2.5rem] shadow-[0_-12px_30px_rgb(0,0,0,0.2)] p-6 min-h-full flex flex-col items-center gap-6 pb-32">
+            {/* Scrollable Overlay Layer */}
+            <div className="absolute inset-0 overflow-y-auto overflow-x-hidden scroll-smooth z-10 pt-[240px] pb-12">
+                {/* Responsive White/Dark Card */}
+                <div className="w-full bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] shadow-[0_-12px_30px_rgb(0,0,0,0.2)] p-6 min-h-[500px] flex flex-col items-center gap-6 relative z-10 pointer-events-auto">
 
                     {/* 1. Target Selection Box */}
                     <AnimatePresence>
@@ -137,7 +138,7 @@ export const DoctorHomeView = ({
                                         >
                                             <MessageCircle size={20} />
                                             {hasUnread && !isChatOpen && (
-                                                <span className="absolute top-0 right-0 w-3 h-3 bg-danger border-2 border-slate-100 dark:border-slate-800 rounded-full animate-pulse"></span>
+                                                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white dark:border-slate-800 rounded-full animate-pulse"></span>
                                             )}
                                         </button>
                                     )}
@@ -250,6 +251,11 @@ export const DoctorHomeView = ({
                         </div>
                     </div>
 
+                </div>
+
+                {/* Footer Section revealing the fixed background */}
+                <div className="w-full py-8 mb-6 flex items-center justify-center text-emerald-100 font-medium tracking-wide">
+                    Built with <HeartPulse size={20} className="mx-2 text-emerald-400 animate-bounce" /> to help
                 </div>
             </div>
         </motion.div>
