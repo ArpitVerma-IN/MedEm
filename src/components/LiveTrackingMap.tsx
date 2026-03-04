@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Maximize2, Minimize2, X } from 'lucide-react';
+import { Maximize2, Minimize2, X, Locate } from 'lucide-react';
 import type { User, Location as UserLocation } from '../types';
 
 // Create a custom hook to center the map on a location with a slight debounce
@@ -53,6 +54,7 @@ interface LiveTrackingMapProps {
     nearbyPatients: { user: User, distance: number }[];
     acceptingPatientId: string | null;
     fullscreenOverlay?: React.ReactNode;
+    centerMapToMe?: () => void;
 }
 
 export const LiveTrackingMap = ({
@@ -65,7 +67,8 @@ export const LiveTrackingMap = ({
     incomingDoctors,
     nearbyPatients,
     acceptingPatientId,
-    fullscreenOverlay
+    fullscreenOverlay,
+    centerMapToMe
 }: LiveTrackingMapProps) => {
     type MapState = 'collapsed' | 'mini' | 'large';
     const [mapState, setMapState] = useState<MapState>('collapsed');
@@ -187,12 +190,17 @@ export const LiveTrackingMap = ({
                 </div>
             )}
 
-            {mapState === 'large' && (
+            {mapState === 'large' && createPortal(
                 <div className="fixed inset-0 z-[5000] bg-slate-900 pointer-events-auto animate-in fade-in duration-300 flex flex-col">
-                    <div className="absolute top-8 right-6 z-[2000] flex flex-col gap-2 pointer-events-auto">
+                    <div className="absolute top-8 right-6 z-[6000] flex flex-col gap-3 pointer-events-auto items-center">
                         <button onClick={() => setMapState('mini')} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 cursor-pointer">
                             <Minimize2 size={24} strokeWidth={2.5} />
                         </button>
+                        {centerMapToMe && (
+                            <button onClick={centerMapToMe} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-med cursor-pointer">
+                                <Locate strokeWidth={2.5} size={24} />
+                            </button>
+                        )}
                     </div>
                     <MapContainer
                         center={defaultCenter}
@@ -204,11 +212,14 @@ export const LiveTrackingMap = ({
                     </MapContainer>
 
                     {fullscreenOverlay && (
-                        <div className="absolute bottom-24 left-0 w-full z-[2000] px-6 pointer-events-auto flex justify-center">
-                            {fullscreenOverlay}
+                        <div className="absolute bottom-10 left-0 w-full z-[6000] px-6 pointer-events-none flex justify-center">
+                            <div className="w-full max-w-md flex flex-col gap-3 items-center">
+                                {fullscreenOverlay}
+                            </div>
                         </div>
                     )}
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

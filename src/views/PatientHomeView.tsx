@@ -76,14 +76,18 @@ export const PatientHomeView = ({
     const chatMessages = messages.filter(m => m.senderId === 'me' || m.senderId === activeDoctorId);
 
     // Unread logic
+    const lastMsgCount = useRef(chatMessages.length);
+
     useEffect(() => {
-        if (chatMessages.length > 0) {
-            const lastMsg = chatMessages[chatMessages.length - 1];
+        const currentCount = chatMessages.length;
+        if (currentCount > lastMsgCount.current) {
+            const lastMsg = chatMessages[currentCount - 1];
             if (lastMsg.senderId !== 'me' && !isChatOpen) {
                 setHasUnread(true);
             }
         }
-    }, [chatMessages, isChatOpen]);
+        lastMsgCount.current = currentCount;
+    }, [chatMessages]);
 
     useEffect(() => {
         if (isChatOpen) {
@@ -95,11 +99,83 @@ export const PatientHomeView = ({
     const isTimeoutReached = needsCare && incomingDoctors.length === 0 && isTimeout;
     const showMap = !needsCare || incomingDoctors.length > 0;
 
+    const DoctorApproachingBanner = (
+        <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="mt-2 w-full max-w-md bg-success dark:bg-success-dark text-white p-5 rounded-[1.5rem] shadow-xl border border-success-light/30 flex flex-col gap-3 relative overflow-hidden shrink-0 pointer-events-auto"
+        >
+            <div className="absolute inset-0 bg-white/10 animate-pulse mix-blend-overlay pointer-events-none"></div>
+
+            <div className="flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-2">
+                    <Navigation className="animate-bounce drop-shadow-md" size={24} />
+                    <span className="font-extrabold text-[0.95rem] uppercase tracking-wider drop-shadow-sm">
+                        Doctor Approaching
+                    </span>
+                </div>
+                <button
+                    onClick={() => setIsChatOpen(!isChatOpen)}
+                    className="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors relative pointer-events-auto"
+                >
+                    <MessageCircle size={20} />
+                    {hasUnread && !isChatOpen && (
+                        <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-green-600 dark:border-green-800 rounded-full animate-pulse"></span>
+                    )}
+                </button>
+            </div>
+
+            <div className="flex flex-col gap-1 relative z-10 px-2 pointer-events-auto">
+                {incomingDoctors.map(d => (
+                    <span key={d.user.id} className="font-semibold text-base drop-shadow-sm">
+                        Dr. {d.user.name} is <span className="font-black bg-white/30 px-2 py-0.5 rounded-md inline-block">{formatDist(d.distance)}</span> away
+                    </span>
+                ))}
+            </div>
+
+            {/* Expandable Chat Area */}
+            {isChatOpen && (
+                <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    className="bg-white/10 rounded-xl p-3 mt-2 flex flex-col gap-3 relative z-10 h-48 pointer-events-auto"
+                >
+                    <div className="flex-1 overflow-y-auto pr-2 space-y-2 text-sm flex flex-col">
+                        {chatMessages.length === 0 ? (
+                            <div className="text-white/60 text-center text-xs italic my-auto">
+                                Send a message to your responder.
+                            </div>
+                        ) : (
+                            chatMessages.map((msg, i) => (
+                                <div key={i} className={clsx("flex flex-col max-w-[85%] rounded-lg p-2", msg.senderId === 'me' ? 'self-end bg-white/20 items-end' : 'self-start bg-success-700 items-start')}>
+                                    <span className="font-medium text-[13px]">{msg.message}</span>
+                                </div>
+                            ))
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+                    <form onSubmit={handleSendMsg} className="flex gap-2">
+                        <input
+                            type="text"
+                            value={msgInput}
+                            onChange={e => setMsgInput(e.target.value)}
+                            placeholder="Quick message..."
+                            className="w-full bg-white/20 text-white placeholder:text-white/50 rounded-lg px-3 py-2 text-sm outline-none border border-white/10 focus:border-white/30 transition-colors pointer-events-auto"
+                        />
+                        <button type="submit" disabled={!msgInput.trim()} className="bg-white/20 hover:bg-white/30 disabled:opacity-50 p-2 rounded-lg transition-colors pointer-events-auto">
+                            <Send size={16} />
+                        </button>
+                    </form>
+                </motion.div>
+            )}
+        </motion.div>
+    );
+
     const SOSButton = (
         <button
             onClick={() => setNeedsCare(!needsCare)}
             className={clsx(
-                "w-full max-w-md font-bold text-[1.1rem] py-4 px-6 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 shrink-0 relative z-20 active:scale-95",
+                "w-full max-w-md font-bold text-[1.1rem] py-4 px-6 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 shrink-0 relative z-20 active:scale-95 pointer-events-auto",
                 needsCare
                     ? "bg-success text-white hover:bg-success-dark shadow-success/30"
                     : "bg-danger text-white hover:bg-danger-dark shadow-danger/30"
@@ -174,7 +250,13 @@ export const PatientHomeView = ({
                                     incomingDoctors={incomingDoctors}
                                     nearbyPatients={nearbyPatients}
                                     acceptingPatientId={null}
-                                    fullscreenOverlay={SOSButton}
+                                    fullscreenOverlay={
+                                        <>
+                                            {incomingDoctors.length > 0 && DoctorApproachingBanner}
+                                            {SOSButton}
+                                        </>
+                                    }
+                                    centerMapToMe={centerMapToMe}
                                 />
                                 {/* Floating Locate Button */}
                                 <div className="absolute -bottom-4 -right-2 z-[3000]">
@@ -222,77 +304,7 @@ export const PatientHomeView = ({
                     </AnimatePresence>
 
                     {/* 3. Incoming Doctor Notifications & Messaging */}
-                    {incomingDoctors.length > 0 && (
-                        <motion.div
-                            initial={{ y: -10, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            className="mt-2 w-full max-w-md bg-success dark:bg-success-dark text-white p-5 rounded-[1.5rem] shadow-xl border border-success-light/30 flex flex-col gap-3 relative overflow-hidden shrink-0"
-                        >
-                            <div className="absolute inset-0 bg-white/10 animate-pulse mix-blend-overlay pointer-events-none"></div>
-
-                            <div className="flex items-center justify-between relative z-10">
-                                <div className="flex items-center gap-2">
-                                    <Navigation className="animate-bounce drop-shadow-md" size={24} />
-                                    <span className="font-extrabold text-[0.95rem] uppercase tracking-wider drop-shadow-sm">
-                                        Doctor Approaching
-                                    </span>
-                                </div>
-                                <button
-                                    onClick={() => setIsChatOpen(!isChatOpen)}
-                                    className="bg-white/20 hover:bg-white/30 p-2 rounded-full transition-colors relative"
-                                >
-                                    <MessageCircle size={20} />
-                                    {hasUnread && !isChatOpen && (
-                                        <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-green-600 dark:border-green-800 rounded-full animate-pulse"></span>
-                                    )}
-                                </button>
-                            </div>
-
-                            <div className="flex flex-col gap-1 relative z-10 px-2">
-                                {incomingDoctors.map(d => (
-                                    <span key={d.user.id} className="font-semibold text-base drop-shadow-sm">
-                                        Dr. {d.user.name} is <span className="font-black bg-white/30 px-2 py-0.5 rounded-md inline-block">{formatDist(d.distance)}</span> away
-                                    </span>
-                                ))}
-                            </div>
-
-                            {/* Expandable Chat Area */}
-                            {isChatOpen && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    className="bg-white/10 rounded-xl p-3 mt-2 flex flex-col gap-3 relative z-10 h-48"
-                                >
-                                    <div className="flex-1 overflow-y-auto pr-2 space-y-2 text-sm flex flex-col">
-                                        {chatMessages.length === 0 ? (
-                                            <div className="text-white/60 text-center text-xs italic my-auto">
-                                                Send a message to your responder.
-                                            </div>
-                                        ) : (
-                                            chatMessages.map((msg, i) => (
-                                                <div key={i} className={clsx("flex flex-col max-w-[85%] rounded-lg p-2", msg.senderId === 'me' ? 'self-end bg-white/20 items-end' : 'self-start bg-success-700 items-start')}>
-                                                    <span className="font-medium text-[13px]">{msg.message}</span>
-                                                </div>
-                                            ))
-                                        )}
-                                        <div ref={messagesEndRef} />
-                                    </div>
-                                    <form onSubmit={handleSendMsg} className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            value={msgInput}
-                                            onChange={e => setMsgInput(e.target.value)}
-                                            placeholder="Quick message..."
-                                            className="w-full bg-white/20 text-white placeholder:text-white/50 rounded-lg px-3 py-2 text-sm outline-none border border-white/10 focus:border-white/30 transition-colors"
-                                        />
-                                        <button type="submit" disabled={!msgInput.trim()} className="bg-white/20 hover:bg-white/30 disabled:opacity-50 p-2 rounded-lg transition-colors">
-                                            <Send size={16} />
-                                        </button>
-                                    </form>
-                                </motion.div>
-                            )}
-                        </motion.div>
-                    )}
+                    {incomingDoctors.length > 0 && DoctorApproachingBanner}
 
                 </div>
 
