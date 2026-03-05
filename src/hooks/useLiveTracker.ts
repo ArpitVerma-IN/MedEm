@@ -180,7 +180,7 @@ export const useLiveTracker = ({
                 if (user.userType === 'Patient' && user.needsCare && user.location) {
                     const userLatLng = L.latLng(user.location.lat, user.location.lng);
                     const distance = myLatLng.distanceTo(userLatLng);
-                    if (distance <= 500) nearby.push({ user, distance });
+                    if (distance <= 2000) nearby.push({ user, distance });
                 }
             });
             setNearbyPatients(nearby);
