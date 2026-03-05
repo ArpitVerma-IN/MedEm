@@ -1,4 +1,4 @@
-import { Navigation, Locate, HeartPulse, CheckCircle, AlertCircle, Loader2, Send, MessageCircle } from 'lucide-react';
+import { Navigation, Locate, HeartPulse, CheckCircle, AlertCircle, Loader2, Send, MessageCircle, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { LiveTrackingMap } from '../components/LiveTrackingMap';
@@ -221,7 +221,13 @@ export const PatientHomeView = ({
 
                 {/* SystemAnnouncementPlaceholder Frame */}
                 <div id="SystemAnnouncementPlaceholder" className="w-full empty:hidden mt-4 relative z-10 pointer-events-auto flex flex-col transition-all duration-300">
-                    {/* Placeholder content goes here in the future - currently empty */}
+                    <div className="bg-amber-500/10 border border-amber-500/20 backdrop-blur-md rounded-2xl p-4 flex items-start gap-4 shadow-lg shadow-amber-500/5">
+                        <AlertTriangle className="text-amber-400 animate-pulse shrink-0 mt-0.5" size={24} />
+                        <div className="flex flex-col">
+                            <span className="text-amber-100 font-bold text-[0.95rem] tracking-wide mb-1 drop-shadow-sm">Severe Heatstroke Warning</span>
+                            <span className="text-amber-100/90 text-sm font-medium leading-relaxed">Extreme heatwave alerts active across India from February to July. Stay hydrated and track nearby responders.</span>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Decoration Graphic */}
