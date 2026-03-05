@@ -205,8 +205,11 @@ export const PatientHomeView = ({
             {/* Dynamic Sticky Background Brand Layer */}
             <div className="sticky top-0 left-0 w-full pt-12 px-6 pb-20 flex flex-col text-white pointer-events-none z-0">
                 <div className="flex items-center justify-between mb-4 pointer-events-auto relative z-10">
-                    <span className="text-sm font-semibold opacity-90 tracking-[0.2em] uppercase mt-2 drop-shadow-sm">MedEm Network</span>
-                    <div className="bg-white/10 p-2 rounded-full backdrop-blur-md mt-2 border border-white/20 shadow-sm">
+                    <div className="flex items-center gap-2">
+                        <img src="/logo.svg" alt="MedEm" className="w-8 h-8 drop-shadow-md" />
+                        <span className="text-[0.75rem] font-black opacity-90 tracking-[0.2em] uppercase mt-1 drop-shadow-sm">MedEm Network</span>
+                    </div>
+                    <div className="bg-white/10 p-2 rounded-full backdrop-blur-md border border-white/20 shadow-sm mt-1">
                         <span className="text-white text-xs font-bold leading-none px-1 drop-shadow-sm">{name.charAt(0).toUpperCase()}</span>
                     </div>
                 </div>
@@ -314,7 +317,7 @@ export const PatientHomeView = ({
                 </div>
 
                 {/* Footer Section revealing the fixed background */}
-                <div className="w-full py-8 mt-2 mb-6 flex items-center justify-center text-[#C1C1F8] font-medium tracking-wide">
+                <div className="w-full pt-8 pb-32 mt-2 flex items-center justify-center text-[#C1C1F8] font-medium tracking-wide">
                     Built with <HeartPulse size={20} className="mx-2 text-danger animate-pulse" /> to help
                 </div>
             </div>

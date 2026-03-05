@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="public/logo.svg" width="120" style="margin-bottom: 20px;" alt="MedEm Logo"/>
+
 # 🚑 MedEm: Emergency Responder Prototype
 **A High-Performance Real-Time Location Tracking Application**
 
@@ -23,7 +25,9 @@
 
 **MedEm** is an advanced minimum viable prototype for evaluating live-tracking infrastructure in large-scale medical applications. 
 
-By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it enables multiple remote users (Doctors and Patients) to stream their exact cross-global coordinates securely onto a dynamic leaflet map in real-time. Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely independent, mobile-first responsive dashboards tailored explicitly for Patients and Responders using Tailwind CSS v4 and Framer Motion. This major update introduced persistent guest authentication, interactive sub-settings views, dynamic system dark/light theming, modular code-splitting for optimal performance, and foundational tracking map enhancements.
+By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it enables multiple remote users (Doctors and Patients) to stream their exact cross-global coordinates securely onto a dynamic leaflet map in real-time. 
+
+Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely independent, mobile-first responsive dashboards tailored explicitly for Patients and Responders using Tailwind CSS v4 and Framer Motion. This major update introduced persistent guest authentication, interactive sub-settings views, dynamic system dark/light theming, modular code-splitting for optimal performance across device capabilities, intelligent lazy loading for heavy component routes, and foundational tracking map enhancements fixing canvas responsiveness.
 
 ---
 
@@ -37,11 +41,13 @@ By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it e
 - **Role Detection:** Upon login, users distinctly select to join as either a **Patient** or a **Doctor**.
 - **Dynamic Alerts:** If a Patient securely declares they `"need medical care!"` and actively enters a **500-meter radius** of a logged-in Doctor, the Doctor's dashboard triggers an emergency state—deploying red banners and aggressively pulsating map markers to draw direct attention to the patient's coordinates.
 - **Targeted Rescue Mode:** Doctors can triage patients. By accepting to assist a specific patient from their targeting UI, the system engages *only* that patient. It displays a live decreasing Approach Distance (`e.g., Tracking: 240 m`) for the Doctor, while broadcasting a private `A Doctor is on the way!` slide-up banner to the Patient.
-### 🔒 AES-256 End-to-End Encryption (E2EE)
-- **Private Medical Communications:** MedEm secures all real-time messaging between victims and responders utilizing the native browser `Web Crypto API` (AES-GCM) over the WebSocket layer. Messages are cryptographically converted into unreadable ciphertext securely within the device memory before they even hit the server, ensuring privacy and HIPAA-aligned communication protocols. The backend operates identically as a blind relay.
+### 🔒 AES-256-CBC End-to-End Encryption (E2EE)
+- **Private Medical Communications:** MedEm secures all real-time messaging between victims and responders utilizing a deeply-integrated polymorphic drop-in of the native **NodeJS `crypto` module** safely executing over Vite polyfills across the WebSocket layer. Messages are cryptographically converted into unreadable AES-256-CBC ciphertext securely within the device memory before they even hit the server, ensuring rapid encryption avoiding restrictive browser `window.crypto` contexts. The backend operates identically as a blind relay.
 
-### 🌐 Tripartite Elastic Map Elements
+### 🌐 Tripartite Elastic Map Elements & Responsive Architecture
 - **Mobile Real-Estate Constraints:** The live Map transitions seamlessly through three states (*Collapsed*, *Mini-Modal*, and *Fullscreen*). It features newly rebuilt layout logic mapping independent Dark Mode/Light Mode toggles directly to CartoDB vector endpoints, minimizing visual strain in nighttime environments.
+- **Dynamic Canvases:** The dashboard headers operate on highly responsive flex-driven sticky canvases that seamlessly overlapping under main elements instead of rigid hardcoding, automatically stretching correctly for any future "announcements/alerts" without breaking UI scale or causing z-index component freezing.
+- **Aggressive Code-Splitting optimization:** Features massive bundle size minimizations using `React.lazy` and strict `<Suspense>` boundaries. Visitors do not load massive chunk-heavy interactive maps, history logs, or AI verification routes until explicitly invoked, securing lightning-cast initial TTFB (Time To First Byte).
 
 ### ⚡ Technology Stack
 - **Frontend Framework:** React 19 + TypeScript (Powered by Vite)

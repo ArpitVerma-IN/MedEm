@@ -207,8 +207,11 @@ export const DoctorHomeView = ({
             {/* Dynamic Sticky Background Brand Layer */}
             <div className="sticky top-0 left-0 w-full pt-12 px-6 pb-20 flex flex-col text-white pointer-events-none z-0">
                 <div className="flex items-center justify-between mb-4 pointer-events-auto relative z-10">
-                    <span className="text-xs font-bold opacity-90 tracking-widest uppercase text-emerald-100 mt-2 drop-shadow-sm">Responder Active</span>
-                    <div className="bg-white/10 p-2 rounded-full backdrop-blur-md border border-white/20 shadow-sm mt-2">
+                    <div className="flex flex-col">
+                        <span className="text-xs font-bold opacity-90 tracking-widest uppercase text-emerald-100 drop-shadow-sm">Responder Active</span>
+                        <img src="/logo.svg" alt="MedEm" className="w-8 h-8 drop-shadow-md mt-1" />
+                    </div>
+                    <div className="bg-white/10 p-2 rounded-full backdrop-blur-md border border-white/20 shadow-sm mt-1">
                         <span className="text-white text-xs font-black leading-none px-1 drop-shadow-sm">DR</span>
                     </div>
                 </div>
@@ -268,7 +271,7 @@ export const DoctorHomeView = ({
                 </div>
 
                 {/* Footer Section revealing the fixed background */}
-                <div className="w-full py-8 mt-2 mb-6 flex items-center justify-center text-emerald-100/80 font-medium tracking-wide">
+                <div className="w-full pt-8 pb-32 mt-2 flex items-center justify-center text-emerald-100/80 font-medium tracking-wide">
                     Built with <HeartPulse size={20} className="mx-2 text-danger animate-pulse" /> to help
                 </div>
             </div>
