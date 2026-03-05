@@ -86,7 +86,7 @@ export const PatientDashboard = () => {
             {/* Main Content Area */}
             <div className="flex-1 relative flex flex-col w-full h-full overflow-hidden">
                 <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
-                    <AnimatePresence mode="popLayout" initial={false}>
+                    <AnimatePresence mode="wait" initial={false}>
                         {activeTab === 'home' && (
                             <PatientHomeView
                                 key="home"
