@@ -8,8 +8,11 @@ import type { TabType } from '../components/BottomNav';
 
 // Views
 import { DoctorHomeView } from '../views/DoctorHomeView';
-import { DoctorHistoryView } from '../views/DoctorHistoryView';
-import { DoctorProfileView } from '../views/DoctorProfileView';
+import { Suspense, lazy } from 'react';
+
+// Lazy loaded views for Phase 2/3 performance
+const DoctorHistoryView = lazy(() => import('../views/DoctorHistoryView').then(m => ({ default: m.DoctorHistoryView })));
+const DoctorProfileView = lazy(() => import('../views/DoctorProfileView').then(m => ({ default: m.DoctorProfileView })));
 
 const colors = ['#059669', '#10B981', '#34D399', '#047857'];
 const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
@@ -84,27 +87,29 @@ export const DoctorDashboard = () => {
         <div className="flex flex-col h-[100dvh] w-full bg-[#064E3B] dark:bg-[#022C22] font-inter overflow-hidden relative">
             {/* Main Content Area */}
             <div className="flex-1 relative flex flex-col w-full h-full overflow-hidden shrink-0">
-                <AnimatePresence mode="popLayout" initial={false}>
-                    {activeTab === 'home' && (
-                        <DoctorHomeView
-                            key="home"
-                            name={name}
-                            myColor={myColor}
-                            myLocation={myLocation}
-                            users={users}
-                            incomingDoctors={incomingDoctors}
-                            nearbyPatients={nearbyPatients}
-                            acceptingPatientId={acceptingPatientId}
-                            setAcceptingPatientId={setAcceptingPatientId}
-                            setIsAcceptingHelp={setIsAcceptingHelp}
-                            messages={messages}
-                            sendMessage={sendMessage}
-                            centerMapToMe={centerMapToMe}
-                        />
-                    )}
-                    {activeTab === 'history' && <DoctorHistoryView key="history" />}
-                    {activeTab === 'profile' && <DoctorProfileView key="profile" name={name} />}
-                </AnimatePresence>
+                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
+                    <AnimatePresence mode="popLayout" initial={false}>
+                        {activeTab === 'home' && (
+                            <DoctorHomeView
+                                key="home"
+                                name={name}
+                                myColor={myColor}
+                                myLocation={myLocation}
+                                users={users}
+                                incomingDoctors={incomingDoctors}
+                                nearbyPatients={nearbyPatients}
+                                acceptingPatientId={acceptingPatientId}
+                                setAcceptingPatientId={setAcceptingPatientId}
+                                setIsAcceptingHelp={setIsAcceptingHelp}
+                                messages={messages}
+                                sendMessage={sendMessage}
+                                centerMapToMe={centerMapToMe}
+                            />
+                        )}
+                        {activeTab === 'history' && <DoctorHistoryView key="history" />}
+                        {activeTab === 'profile' && <DoctorProfileView key="profile" name={name} />}
+                    </AnimatePresence>
+                </Suspense>
             </div>
 
             {/* Bottom Navigation */}
