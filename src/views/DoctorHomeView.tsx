@@ -202,32 +202,37 @@ export const DoctorHomeView = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-[#064E3B] dark:bg-[#022C22] font-inter overflow-hidden flex flex-col"
+            className="absolute inset-0 bg-[#064E3B] dark:bg-[#022C22] font-inter overflow-y-auto overflow-x-hidden scroll-smooth flex flex-col"
         >
-            {/* Fixed Background Brand Layer */}
-            <div className="fixed top-0 left-0 w-full pt-12 px-6 flex flex-col text-white pointer-events-none z-0">
-                <div className="flex items-center justify-between mb-4 pointer-events-auto">
-                    <span className="text-xs font-bold opacity-80 tracking-widest uppercase text-emerald-100 mt-2">Responder Active</span>
-                    <div className="bg-white/20 p-2 rounded-full backdrop-blur-sm border border-white/10 shadow-sm mt-2">
-                        <span className="text-white text-xs font-black leading-none px-1">DR</span>
+            {/* Dynamic Sticky Background Brand Layer */}
+            <div className="sticky top-0 left-0 w-full pt-12 px-6 pb-20 flex flex-col text-white pointer-events-none z-0">
+                <div className="flex items-center justify-between mb-4 pointer-events-auto relative z-10">
+                    <span className="text-xs font-bold opacity-90 tracking-widest uppercase text-emerald-100 mt-2 drop-shadow-sm">Responder Active</span>
+                    <div className="bg-white/10 p-2 rounded-full backdrop-blur-md border border-white/20 shadow-sm mt-2">
+                        <span className="text-white text-xs font-black leading-none px-1 drop-shadow-sm">DR</span>
                     </div>
                 </div>
 
-                <h1 className="text-3xl font-extrabold tracking-tight mb-1 drop-shadow-sm">Dr. {name}</h1>
-                <p className="text-emerald-100/90 font-medium text-[1.05rem] max-w-[260px] leading-relaxed">
+                <h1 className="text-4xl font-extrabold tracking-tight mb-2 relative z-10 drop-shadow-md">Dr. {name}</h1>
+                <p className="text-emerald-100/95 font-medium text-[1.1rem] max-w-[280px] leading-relaxed relative z-10 drop-shadow-sm">
                     Standing by for emergency tracking signals.
                 </p>
 
+                {/* SystemAnnouncementPlaceholder Frame */}
+                <div id="SystemAnnouncementPlaceholder" className="w-full empty:hidden mt-4 relative z-10 pointer-events-auto flex flex-col transition-all duration-300">
+                    {/* Placeholder content goes here in the future - currently empty */}
+                </div>
+
                 {/* Decoration Graphic */}
-                <div className="absolute top-10 right-0 opacity-[0.15] transform translate-x-1/4 scale-125 z-0">
+                <div className="absolute top-10 right-0 opacity-[0.10] transform translate-x-1/4 scale-125 pointer-events-none z-0">
                     <Activity size={180} strokeWidth={1} />
                 </div>
             </div>
 
-            {/* Scrollable Overlay Layer */}
-            <div className="absolute inset-0 overflow-y-auto overflow-x-hidden scroll-smooth z-10 pt-[240px] pb-12">
+            {/* Main Content Card Layer */}
+            <div className="relative z-10 w-full -mt-10 px-0 flex flex-col shrink-0 flex-1">
                 {/* Responsive White/Dark Card */}
-                <div className="w-full bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] shadow-[0_-12px_30px_rgb(0,0,0,0.2)] p-6 min-h-[500px] flex flex-col items-center gap-6 relative z-10 pointer-events-auto">
+                <div className="w-full bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] shadow-[0_-12px_30px_rgb(0,0,0,0.18)] p-6 min-h-[500px] flex flex-col items-center gap-6 pointer-events-auto border-t border-emerald-500/10 flex-1 relative z-20">
 
                     {/* 1. Target Selection Box */}
                     {/* 1. Target Selection Box */}
@@ -263,8 +268,8 @@ export const DoctorHomeView = ({
                 </div>
 
                 {/* Footer Section revealing the fixed background */}
-                <div className="w-full py-8 mb-6 flex items-center justify-center text-emerald-100 font-medium tracking-wide">
-                    Built with <HeartPulse size={20} className="mx-2 text-emerald-400 animate-bounce" /> to help
+                <div className="w-full py-8 mt-2 mb-6 flex items-center justify-center text-emerald-100/80 font-medium tracking-wide">
+                    Built with <HeartPulse size={20} className="mx-2 text-danger animate-pulse" /> to help
                 </div>
             </div>
         </motion.div>
