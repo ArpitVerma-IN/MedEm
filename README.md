@@ -147,6 +147,9 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
 - **Tech Stack:** 
   [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](#) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#) 
 
+> [!NOTE]
+> **To accelerate Phase 2 & 3 integrations**, dynamic uninitialized boilerplate architectures (`src/context/AuthContext.tsx`, `src/services/db.ts`, and `src/services/ai.ts`) have been added to the master branch. These contain foundational structural mapping necessary for scaling data services and authentication cleanly in the upcoming cycles without rewriting the DOM. 
+
 ### 📋 Roadmap Summary
 
 | Phase | Title | Brief Summary |

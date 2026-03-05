@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Map, User as GuestIcon, Mail } from 'lucide-react';
+import { User as GuestIcon, Mail } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const LandingPage = () => {
@@ -50,11 +50,11 @@ export const LandingPage = () => {
             >
                 {/* Logo & Headline */}
                 <div className="flex flex-col items-center mb-2">
-                    <div className="w-20 h-20 bg-med-100 dark:bg-med-900/40 text-med dark:text-med-light rounded-[24px] flex items-center justify-center shadow-inner border border-med-200 dark:border-med/20 mb-6 relative overflow-hidden">
-                        <Map size={36} strokeWidth={2.5} className="relative z-10" />
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/10 dark:to-transparent" />
+                    <div className="w-24 h-24 bg-med-50/50 dark:bg-med-900/20 text-med dark:text-med-light rounded-[28px] flex items-center justify-center shadow-inner border border-med-200 dark:border-med/20 mb-6 relative overflow-hidden">
+                        <img src="/logo.svg" alt="MedEm Logo" className="w-16 h-16 relative z-10 drop-shadow-md" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/10 dark:to-transparent pointer-events-none" />
                     </div>
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">Med<span className="text-med">Em</span></h1>
+                    <h1 className="text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-3 drop-shadow-sm">Med<span className="text-med">Em</span></h1>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed px-4">Instant connection to the emergency responder network.</p>
                 </div>
 

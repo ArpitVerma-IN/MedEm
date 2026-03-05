@@ -207,9 +207,9 @@ export const DoctorHomeView = ({
             {/* Dynamic Sticky Background Brand Layer */}
             <div className="sticky top-0 left-0 w-full pt-12 px-6 pb-20 flex flex-col text-white pointer-events-none z-0">
                 <div className="flex items-center justify-between mb-4 pointer-events-auto relative z-10">
-                    <div className="flex flex-col">
+                    <div className="flex flex-col gap-1">
                         <span className="text-xs font-bold opacity-90 tracking-widest uppercase text-emerald-100 drop-shadow-sm">Responder Active</span>
-                        <img src="/logo.svg" alt="MedEm" className="w-8 h-8 drop-shadow-md mt-1" />
+                        <img src="/logo.svg" alt="MedEm" className="w-12 h-12 drop-shadow-md mt-1" />
                     </div>
                     <div className="bg-white/10 p-2 rounded-full backdrop-blur-md border border-white/20 shadow-sm mt-1">
                         <span className="text-white text-xs font-black leading-none px-1 drop-shadow-sm">DR</span>
