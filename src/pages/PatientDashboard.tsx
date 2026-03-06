@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { useLiveTracker } from '../hooks/useLiveTracker';
 import { BottomNav } from '../components/BottomNav';
@@ -85,29 +85,45 @@ export const PatientDashboard = () => {
         <div className="flex flex-col h-[100dvh] w-full bg-gray-50 dark:bg-gray-950 overflow-hidden font-inter text-gray-900 dark:text-gray-100">
             {/* Main Content Area */}
             <div className="flex-1 relative flex flex-col w-full h-full overflow-hidden">
-                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
-                    <AnimatePresence mode="wait" initial={false}>
-                        {activeTab === 'home' && (
-                            <PatientHomeView
-                                key="home"
-                                name={name}
-                                myColor={myColor}
-                                myLocation={myLocation}
-                                users={users}
-                                incomingDoctors={incomingDoctors}
-                                nearbyPatients={nearbyPatients}
-                                needsCare={needsCare}
-                                setNeedsCare={setNeedsCare}
-                                messages={messages}
-                                sendMessage={sendMessage}
-                                centerMapToMe={centerMapToMe}
-                            />
-                        )}
-                        {activeTab === 'ai' && <AIAssistView key="ai" />}
-                        {activeTab === 'history' && <HistoryView key="history" />}
-                        {activeTab === 'profile' && <ProfileView key="profile" name={name} />}
-                    </AnimatePresence>
-                </Suspense>
+                <AnimatePresence mode="wait" initial={false}>
+                    {activeTab === 'home' && (
+                        <PatientHomeView
+                            key="home"
+                            name={name}
+                            myColor={myColor}
+                            myLocation={myLocation}
+                            users={users}
+                            incomingDoctors={incomingDoctors}
+                            nearbyPatients={nearbyPatients}
+                            needsCare={needsCare}
+                            setNeedsCare={setNeedsCare}
+                            messages={messages}
+                            sendMessage={sendMessage}
+                            centerMapToMe={centerMapToMe}
+                        />
+                    )}
+                    {activeTab === 'ai' && (
+                        <motion.div key="ai" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
+                                <AIAssistView />
+                            </Suspense>
+                        </motion.div>
+                    )}
+                    {activeTab === 'history' && (
+                        <motion.div key="history" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
+                                <HistoryView />
+                            </Suspense>
+                        </motion.div>
+                    )}
+                    {activeTab === 'profile' && (
+                        <motion.div key="profile" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
+                                <ProfileView name={name} />
+                            </Suspense>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Bottom Navigation */}

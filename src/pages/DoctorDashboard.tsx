@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { useLiveTracker } from '../hooks/useLiveTracker';
 import { BottomNav } from '../components/BottomNav';
@@ -87,29 +87,39 @@ export const DoctorDashboard = () => {
         <div className="flex flex-col h-[100dvh] w-full bg-[#064E3B] dark:bg-[#022C22] font-inter overflow-hidden relative">
             {/* Main Content Area */}
             <div className="flex-1 relative flex flex-col w-full h-full overflow-hidden shrink-0">
-                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
-                    <AnimatePresence mode="wait" initial={false}>
-                        {activeTab === 'home' && (
-                            <DoctorHomeView
-                                key="home"
-                                name={name}
-                                myColor={myColor}
-                                myLocation={myLocation}
-                                users={users}
-                                incomingDoctors={incomingDoctors}
-                                nearbyPatients={nearbyPatients}
-                                acceptingPatientId={acceptingPatientId}
-                                setAcceptingPatientId={setAcceptingPatientId}
-                                setIsAcceptingHelp={setIsAcceptingHelp}
-                                messages={messages}
-                                sendMessage={sendMessage}
-                                centerMapToMe={centerMapToMe}
-                            />
-                        )}
-                        {activeTab === 'history' && <DoctorHistoryView key="history" />}
-                        {activeTab === 'profile' && <DoctorProfileView key="profile" name={name} />}
-                    </AnimatePresence>
-                </Suspense>
+                <AnimatePresence mode="wait" initial={false}>
+                    {activeTab === 'home' && (
+                        <DoctorHomeView
+                            key="home"
+                            name={name}
+                            myColor={myColor}
+                            myLocation={myLocation}
+                            users={users}
+                            incomingDoctors={incomingDoctors}
+                            nearbyPatients={nearbyPatients}
+                            acceptingPatientId={acceptingPatientId}
+                            setAcceptingPatientId={setAcceptingPatientId}
+                            setIsAcceptingHelp={setIsAcceptingHelp}
+                            messages={messages}
+                            sendMessage={sendMessage}
+                            centerMapToMe={centerMapToMe}
+                        />
+                    )}
+                    {activeTab === 'history' && (
+                        <motion.div key="history" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
+                                <DoctorHistoryView />
+                            </Suspense>
+                        </motion.div>
+                    )}
+                    {activeTab === 'profile' && (
+                        <motion.div key="profile" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
+                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
+                                <DoctorProfileView name={name} />
+                            </Suspense>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Bottom Navigation */}

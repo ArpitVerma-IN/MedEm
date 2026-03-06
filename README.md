@@ -60,6 +60,8 @@ Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely ind
 ---
 
 ## 🚀 How to Deploy (Step-by-Step)
+> [!WARNING]
+> **Strictly for developers.** Production deployment requires foundational cloud architecture knowledge.
 
 Because this web architecture strictly relies on both a persistent WebSockets backend and an SSL-secured frontend UI (which is mandatory for browser Geolocation APIs), this application must be split-deployed across two free cloud providers: **Render** and **Netlify**.
 
@@ -90,6 +92,27 @@ Ensure this entire repository is successfully uploaded into a remote GitHub repo
 6. Click **Deploy Site**.
 
 Once Netlify supplies your live HTTPS URL, send it to any mobile device in the world to begin tracking!
+
+---
+
+## 📱 Progressive Web App (PWA) Installation Guide
+
+MedEm is designed as a fully responsive, mobile-first web ecosystem. For the absolute best, fullscreen native-app experience without browser URL bars taking up screen space, users should install the app directly to their home screens using Google Chrome.
+
+### Android Installation (via Google Chrome)
+1. Open the live MedEm HTTPS URL in **Google Chrome** on your Android device.
+2. Tap the **Three Dots (⋮)** menu icon in the top right corner.
+3. Select **"Add to Home screen"** or **"Install app"**.
+4. Confirm the installation. MedEm will now appear in your app drawer and launch fluidly in fullscreen mode.
+
+### iOS Installation (via Safari or Chrome)
+1. Open the live MedEm HTTPS URL in **Safari** (or Chrome) on your iPhone/iPad.
+2. Tap the **Share** icon (the square with an arrow pointing up) at the bottom center of the screen.
+3. Scroll down and tap **"Add to Home Screen"** (you may need to swipe up slightly to see it).
+4. Tap **Add** in the top right corner. The MedEm icon will now sit alongside your native iOS apps.
+
+> [!TIP]
+> Launching MedEm via the Home Screen shortcut guarantees maximum screen real estate for the tracking map and guarantees smoother background geolocation API transitions on mobile devices.
 
 ---
 
