@@ -41,6 +41,14 @@ Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely ind
 - **Role Detection:** Upon login, users distinctly select to join as either a **Patient** or a **Doctor**.
 - **Personalized SOS Radius:** Responders can explicitly set their operating bounds (`500m Urban`, `1km Semi-Urban`, or `2km Rural`) via the Responder Settings UI. Patient `"need medical care!"` SOS broadcasts are strictly isolated to map instances where the responding Doctor is exactly within their chosen dynamic geofence, preserving real-world transit realism.
 - **Targeted Rescue Mode:** Doctors can triage patients. By accepting to assist a specific patient from their targeting UI, the system engages *only* that patient. It displays a live decreasing Approach Distance (`e.g., Tracking: 240 m`) for the Doctor, while broadcasting a private `A Doctor is on the way!` slide-up banner to the Patient.
+
+### 🗺️ Real-Time Navigation Assist (OSRM & Nominatim)
+- **Live Routing:** When Responders activate the navigation module, the app maps a highly visible Google-Maps style blue trajectory tracing the fastest road route directly to their targeted patient utilizing the robust Project OSRM API.
+- **Dynamic Compass Pin:** Replaces standard static avatars with dynamic heading-rotation arrow icons, correctly orientating identically to the Responder's real-world physical bearing.
+- **Map Context Switching:** 
+  - *Mini-Map Mode* projects a clean Heads-Up Display showing just the `Time to Arrive (ETA)` pill and instantly Reverse-Geocodes the target's nearest regional Landmark beneath the canvas. 
+  - *Fullscreen Mode* deploys a collapsible, detailed turn-by-turn navigation pane alerting responders to precise distance-to-intersection metrics and upcoming road maneuvers.
+- **Memory Conservation Cache:** Actively pauses and destructs heavy location-routing DOM elements 30 seconds after navigation is toggled off, cleanly resolving memory pollution on lower-end devices while preserving states through accidental double-taps.
 ### 🔒 AES-256-CBC End-to-End Encryption (E2EE)
 - **Private Medical Communications:** MedEm secures all real-time messaging between victims and responders utilizing a deeply-integrated polymorphic drop-in of the native **NodeJS `crypto` module** safely executing over Vite polyfills across the WebSocket layer. Messages are cryptographically converted into unreadable AES-256-CBC ciphertext securely within the device memory before they even hit the server, ensuring rapid encryption avoiding restrictive browser `window.crypto` contexts. The backend operates identically as a blind relay.
 
