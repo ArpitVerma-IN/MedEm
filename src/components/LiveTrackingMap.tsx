@@ -26,20 +26,36 @@ const MapController = ({ center }: { center: [number, number] | null }) => {
 };
 
 // Custom marker icon creation
-const createCustomIcon = (color: string, label: string, isFlickering: boolean = false) => {
+const createCustomIcon = (color: string, label: string, isFlickering: boolean = false, type: 'Doctor' | 'Patient' | 'SOS' = 'Patient') => {
+    if (type === 'SOS') {
+        const customHtml = `
+        <div class="custom-marker flicker">
+          <div class="marker-pin" style="background-color: #EF4444;"></div>
+        </div>
+      `;
+        return L.divIcon({
+            html: customHtml,
+            className: '',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -40]
+        });
+    }
+
+    const borderCol = type === 'Doctor' ? '#047857' : '#1D4ED8';
+    
     const customHtml = `
-    <div class="custom-marker ${isFlickering ? 'flicker' : ''}">
-      <div class="marker-pin" style="background-color: ${color};"></div>
-      <div class="marker-icon">${label}</div>
+    <div style="width: 24px; height: 24px; border-radius: 50%; background-color: ${color}; border: 3px solid ${borderCol}; box-shadow: 0 0 6px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 800; ${isFlickering ? 'animation: pulse 1.5s infinite;' : ''}">
+        ${label}
     </div>
   `;
 
     return L.divIcon({
         html: customHtml,
         className: '',
-        iconSize: [40, 40],
-        iconAnchor: [20, 40],
-        popupAnchor: [0, -40]
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
     });
 };
 
@@ -206,6 +222,20 @@ export const LiveTrackingMap = ({
 
     const formatDist = (m: number) => m > 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
 
+    const findClosestIndex = (coords: [number, number][], current: [number, number]) => {
+        let minDistance = Infinity;
+        let closestIndex = 0;
+        const myLatL = L.latLng(current[0], current[1]);
+        coords.forEach((c, idx) => {
+            const dist = myLatL.distanceTo(L.latLng(c[0], c[1]));
+            if (dist < minDistance) {
+                minDistance = dist;
+                closestIndex = idx;
+            }
+        });
+        return closestIndex;
+    };
+
     const renderMapElements = () => (
         <>
             <TileLayer
@@ -218,14 +248,23 @@ export const LiveTrackingMap = ({
             {myLocation && <MapController center={[myLocation.lat, myLocation.lng]} />}
 
             {isNavEnabled && navData && (
-                <Polyline positions={navData.routeCoords} color="#3B82F6" weight={7} opacity={0.85} />
+                <Polyline 
+                    positions={
+                        myLocation 
+                        ? [ [myLocation.lat, myLocation.lng] as [number, number], ...navData.routeCoords.slice(findClosestIndex(navData.routeCoords, [myLocation.lat, myLocation.lng])) ]
+                        : navData.routeCoords
+                    } 
+                    color="#3B82F6" 
+                    weight={7} 
+                    opacity={0.85} 
+                />
             )}
 
             {/* My Marker */}
             {myLocation && (
                 <Marker
                     position={[myLocation.lat, myLocation.lng]}
-                    icon={isNavEnabled ? createArrowIcon(myColor, navHeading) : createCustomIcon(myColor, name.charAt(0).toUpperCase())}
+                    icon={isNavEnabled ? createArrowIcon(myColor, navHeading) : createCustomIcon(myColor, name.charAt(0).toUpperCase(), false, userType === 'Doctor' ? 'Doctor' : (needsCare ? 'SOS' : 'Patient'))}
                 >
                     <Popup>
                         <strong>{name} ({userType} - You)</strong><br />
@@ -254,6 +293,9 @@ export const LiveTrackingMap = ({
                     }
                 }
 
+                let roleType: 'Doctor' | 'Patient' | 'SOS' = user.userType === 'Doctor' ? 'Doctor' : 'Patient';
+                if (user.needsCare) roleType = 'SOS';
+
                 return (
                     <Marker
                         key={user.id}
@@ -261,7 +303,8 @@ export const LiveTrackingMap = ({
                         icon={createCustomIcon(
                             user.color,
                             user.name.charAt(0).toUpperCase(),
-                            isFlickering && (acceptingPatientId === null || acceptingPatientId === user.id)
+                            isFlickering && (acceptingPatientId === null || acceptingPatientId === user.id),
+                            roleType
                         )}
                     >
                         <Popup>
@@ -313,7 +356,7 @@ export const LiveTrackingMap = ({
                             <button onClick={() => setIsMapDark(!isMapDark)} className="bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600 mt-2">
                                 {isMapDark ? <Sun size={18} strokeWidth={2.5} className="text-amber-500" /> : <Moon size={18} strokeWidth={2.5} />}
                             </button>
-                            <button onClick={() => setIsNavEnabled(!isNavEnabled)} className={`bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow hover:scale-105 transition-transform pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600 ${isNavEnabled ? 'text-blue-500' : 'text-slate-400 dark:text-slate-500'}`}>
+                            <button onClick={() => { if (activeTargetUser) setIsNavEnabled(!isNavEnabled); }} className={`bg-white/95 dark:bg-slate-800/95 p-2.5 rounded-full shadow transition-transform pointer-events-auto cursor-pointer border border-transparent dark:border-slate-600 ${isNavEnabled ? 'text-blue-500 hover:scale-105' : 'text-slate-400 dark:text-slate-500'} ${!activeTargetUser ? 'opacity-40 hover:scale-100' : 'hover:scale-105'}`}>
                                 {isNavEnabled ? <Navigation size={18} strokeWidth={2.5} /> : <NavigationOff size={18} strokeWidth={2.5} />}
                             </button>
                         </div>
@@ -362,7 +405,7 @@ export const LiveTrackingMap = ({
                         <button onClick={() => setIsMapDark(!isMapDark)} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 cursor-pointer">
                             {isMapDark ? <Sun size={24} strokeWidth={2.5} className="text-amber-500" /> : <Moon size={24} strokeWidth={2.5} />}
                         </button>
-                        <button onClick={() => setIsNavEnabled(!isNavEnabled)} className={`bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform cursor-pointer ${isNavEnabled ? 'text-blue-500' : 'text-slate-400 dark:text-slate-500'}`}>
+                        <button onClick={() => { if (activeTargetUser) setIsNavEnabled(!isNavEnabled); }} className={`bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 transition-transform cursor-pointer ${isNavEnabled ? 'text-blue-500 hover:scale-105' : 'text-slate-400 dark:text-slate-500'} ${!activeTargetUser ? 'opacity-40 hover:scale-100' : 'hover:scale-105'}`}>
                             {isNavEnabled ? <Navigation size={24} strokeWidth={2.5} /> : <NavigationOff size={24} strokeWidth={2.5} />}
                         </button>
                     </div>

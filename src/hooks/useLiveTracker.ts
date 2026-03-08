@@ -168,7 +168,8 @@ export const useLiveTracker = ({
             (err) => {
                 onError('Please allow location access to use the app.');
                 console.error(err);
-            }
+            },
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
         );
     };
 
