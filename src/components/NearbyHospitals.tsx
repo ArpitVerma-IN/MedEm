@@ -51,7 +51,7 @@ export const NearbyHospitals = ({
                     .map((el: any) => {
                         const lat = el.lat || el.center?.lat;
                         const lon = el.lon || el.center?.lon;
-                        let dist = 0;
+                        let dist = 100000;
                         if (lat && lon) {
                             const R = 6371e3;
                             const φ1 = location.lat * Math.PI/180;
@@ -69,14 +69,53 @@ export const NearbyHospitals = ({
                             road: el.tags?.["addr:street"] || el.tags?.["addr:full"] || null,
                             suburb: el.tags?.["addr:suburb"] || null,
                             city: el.tags?.["addr:city"] || null,
+                            lat,
+                            lon,
                             distance: dist
                         };
-                    }).sort((a: Facility, b: Facility) => a.distance - b.distance).slice(0, 3);
-                setFacilities(parsed);
+                    })
+                    .filter((f: any) => f.lat && f.lon)
+                    .sort((a: any, b: any) => a.distance - b.distance)
+                    .slice(0, 15); // Take top 15 closest radius locations to ping OSRM for true road distance
+
+                if (parsed.length === 0) {
+                    setFacilities([]);
+                    setLoading(false);
+                    return;
+                }
+
+                // Query OSRM table for actual road navigation distance!
+                const coords = [`${location.lng},${location.lat}`, ...parsed.map((f: any) => `${f.lon},${f.lat}`)].join(';');
+                fetch(`https://router.project-osrm.org/table/v1/driving/${coords}?sources=0&annotations=distance`)
+                    .then(r => r.json())
+                    .then(osrmData => {
+                        if (osrmData.code === 'Ok' && osrmData.distances && osrmData.distances[0]) {
+                            const distances = osrmData.distances[0]; 
+                            parsed.forEach((f: any, idx: number) => {
+                                const roadDist = distances[idx + 1]; // +1 because source [0] is itself
+                                if (roadDist !== undefined && roadDist !== null) {
+                                    f.distance = roadDist;
+                                } else {
+                                    f.distance += 50000; // Penalise unroutable locations
+                                }
+                            });
+                        }
+                        
+                        parsed.sort((a: any, b: any) => a.distance - b.distance);
+                        setFacilities(parsed.slice(0, 3));
+                        setLoading(false);
+                    })
+                    .catch(() => {
+                        setFacilities(parsed.slice(0, 3));
+                        setLoading(false);
+                    });
+            } else {
+                setLoading(false);
             }
         })
-        .catch(() => {})
-        .finally(() => setLoading(false));
+        .catch(() => {
+            setLoading(false);
+        });
     }, [location, isOpen, mode, hasFetched]);
 
     const formatDist = (m: number) => m > 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
