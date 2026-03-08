@@ -22,18 +22,22 @@ export const NearbyHospitals = ({
     const [facilities, setFacilities] = useState<Facility[]>([]);
     const [loading, setLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [hasFetched, setHasFetched] = useState(false);
 
     useEffect(() => {
-        if (!location) return;
+        if (!location || hasFetched) return;
+        if (mode !== 'connecting' && !isOpen) return;
+
+        setHasFetched(true);
         setLoading(true);
         // Using Overpass API to find nearest hospitals and clinics relative to the location
         const query = `
             [out:json];
             (
-              node["amenity"~"hospital|clinic"](around:5000, ${location.lat}, ${location.lng});
-              way["amenity"~"hospital|clinic"](around:5000, ${location.lat}, ${location.lng});
+              node["amenity"~"hospital|clinic"](around:20000, ${location.lat}, ${location.lng});
+              way["amenity"~"hospital|clinic"](around:20000, ${location.lat}, ${location.lng});
             );
-            out center 3;
+            out center 50;
         `;
         fetch('https://overpass-api.de/api/interpreter', {
             method: 'POST',
@@ -42,42 +46,49 @@ export const NearbyHospitals = ({
         .then(res => res.json())
         .then(data => {
             if (data && data.elements) {
-                const parsed = data.elements.map((el: any) => {
-                    const lat = el.lat || el.center?.lat;
-                    const lon = el.lon || el.center?.lon;
-                    let dist = 0;
-                    if (lat && lon) {
-                        const R = 6371e3;
-                        const φ1 = location.lat * Math.PI/180;
-                        const φ2 = lat * Math.PI/180;
-                        const Δφ = (lat - location.lat) * Math.PI/180;
-                        const Δλ = (lon - location.lng) * Math.PI/180;
-                        const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
-                        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                        dist = R * c;
-                    }
+                const parsed = data.elements
+                    .filter((el: any) => el.tags?.name) // Best results: Must have a verified name
+                    .map((el: any) => {
+                        const lat = el.lat || el.center?.lat;
+                        const lon = el.lon || el.center?.lon;
+                        let dist = 0;
+                        if (lat && lon) {
+                            const R = 6371e3;
+                            const φ1 = location.lat * Math.PI/180;
+                            const φ2 = lat * Math.PI/180;
+                            const Δφ = (lat - location.lat) * Math.PI/180;
+                            const Δλ = (lon - location.lng) * Math.PI/180;
+                            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                            dist = R * c;
+                        }
 
-                    return {
-                        id: el.id,
-                        name: el.tags?.name || (el.tags?.amenity === 'clinic' ? 'Local Clinic' : 'General Hospital'),
-                        road: el.tags?.["addr:street"] || el.tags?.["addr:full"] || null,
-                        suburb: el.tags?.["addr:suburb"] || null,
-                        city: el.tags?.["addr:city"] || null,
-                        distance: dist
-                    };
-                }).sort((a: Facility, b: Facility) => a.distance - b.distance).slice(0, 3);
+                        return {
+                            id: el.id,
+                            name: el.tags?.name,
+                            road: el.tags?.["addr:street"] || el.tags?.["addr:full"] || null,
+                            suburb: el.tags?.["addr:suburb"] || null,
+                            city: el.tags?.["addr:city"] || null,
+                            distance: dist
+                        };
+                    }).sort((a: Facility, b: Facility) => a.distance - b.distance).slice(0, 3);
                 setFacilities(parsed);
             }
         })
         .catch(() => {})
         .finally(() => setLoading(false));
-    }, [location]);
+    }, [location, isOpen, mode, hasFetched]);
 
     const formatDist = (m: number) => m > 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
 
     const openMaps = (f: Facility) => {
         const q = `${f.name} ${f.road || ''} ${f.city || ''}`;
         window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`, '_blank');
+    };
+
+    const handleClose = () => {
+        setIsOpen(false);
+        setHasFetched(false);
     };
 
     const detailsView = (
@@ -87,8 +98,8 @@ export const NearbyHospitals = ({
                     <Building2 size={18} strokeWidth={2.5} />
                     Nearest Medical Centers
                 </span>
-                {mode === 'minimized' && (
-                    <button onClick={() => setIsOpen(false)} className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                {mode !== 'connecting' && (
+                    <button onClick={handleClose} className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
                         <X size={16} />
                     </button>
                 )}
@@ -101,7 +112,7 @@ export const NearbyHospitals = ({
                 </div>
             ) : facilities.length === 0 ? (
                 <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 text-center text-sm font-medium text-slate-500">
-                    No verified hospitals or clinics found within 5km radius.
+                    No verified hospitals or clinics found within 20km radius.
                 </div>
             ) : (
                 <div className="flex flex-col gap-2">
