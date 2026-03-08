@@ -2,6 +2,7 @@ import { Navigation, Locate, HeartPulse, CheckCircle, AlertCircle, Loader2, Send
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { LiveTrackingMap } from '../components/LiveTrackingMap';
+import { NearbyHospitals } from '../components/NearbyHospitals';
 import clsx from 'clsx';
 import type { User, Location as UserLocation, ChatMessage } from '../types';
 
@@ -87,7 +88,7 @@ export const PatientHomeView = ({
             }
         }
         lastMsgCount.current = currentCount;
-    }, [chatMessages]);
+    }, [chatMessages, isChatOpen]);
 
     useEffect(() => {
         if (isChatOpen) {
@@ -171,9 +172,40 @@ export const PatientHomeView = ({
         </motion.div>
     );
 
+    const disengageSOS = (targetDoctor?: User, navAddress?: string | null) => {
+        if (!needsCare) return;
+        setNeedsCare(false);
+        const doctor = targetDoctor || (incomingDoctors.length > 0 ? incomingDoctors[0].user : null);
+        if (doctor) {
+            const historyStr = localStorage.getItem('medem_history') || '[]';
+            const history = JSON.parse(historyStr);
+            // Block dupes
+            if (!history.find((h: any) => h.id === "event-" + doctor.id && Date.now() - new Date(h.timestamp).getTime() < 300000)) {
+                history.unshift({
+                    id: Date.now().toString(),
+                    targetId: doctor.id,
+                    targetName: doctor.name,
+                    timestamp: new Date().toISOString(),
+                    location: doctor.location,
+                    address: navAddress || null,
+                    userType: 'Patient',
+                    rating: null
+                });
+                localStorage.setItem('medem_history', JSON.stringify(history));
+                window.dispatchEvent(new Event('history_updated'));
+            }
+        }
+    };
+
+    const handleTargetReached = (target: User, address: string | null) => {
+        if (needsCare) {
+            disengageSOS(target, address);
+        }
+    };
+
     const SOSButton = (
         <button
-            onClick={() => setNeedsCare(!needsCare)}
+            onClick={() => needsCare ? disengageSOS() : setNeedsCare(true)}
             className={clsx(
                 "w-full max-w-md font-bold text-[1.1rem] py-4 px-6 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 shrink-0 relative z-20 active:scale-95 pointer-events-auto",
                 needsCare
@@ -264,9 +296,13 @@ export const PatientHomeView = ({
                                     incomingDoctors={incomingDoctors}
                                     nearbyPatients={nearbyPatients}
                                     acceptingPatientId={null}
+                                    onTargetReached={handleTargetReached}
                                     fullscreenOverlay={
                                         <>
                                             {incomingDoctors.length > 0 && DoctorApproachingBanner}
+                                            {needsCare && incomingDoctors.length > 0 && (
+                                                <NearbyHospitals location={myLocation} mode="minimized" />
+                                            )}
                                             {SOSButton}
                                         </>
                                     }
@@ -281,10 +317,17 @@ export const PatientHomeView = ({
                                         <Locate strokeWidth={2.5} size={28} />
                                     </button>
                                 </div>
+                                
+                                {/* Standby view hospital browser stacked directly below normal map */}
+                                {!needsCare && showMap && (
+                                    <div className="w-full flex justify-center pointer-events-auto relative z-[2000] mt-3 pb-4">
+                                        <NearbyHospitals location={myLocation} mode="standby" />
+                                    </div>
+                                )}
                             </motion.div>
                         )}
 
-                        {isConnecting && (
+                    {isConnecting && (
                             <motion.div
                                 key="connecting"
                                 initial={{ opacity: 0, y: 10 }}
@@ -295,6 +338,7 @@ export const PatientHomeView = ({
                                 <Loader2 className="animate-spin text-med mb-4" size={48} />
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Connecting to Responder</h3>
                                 <p className="text-gray-500 dark:text-gray-400 font-medium">Please wait a moment while we dispatch your exact coordinates to the nearest verified medical professional...</p>
+                                <NearbyHospitals location={myLocation} mode="connecting" />
                             </motion.div>
                         )}
 

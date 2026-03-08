@@ -85,6 +85,47 @@ export const DoctorHomeView = ({
         if (!acceptingPatientId) setIsChatOpen(false);
     }, [acceptingPatientId]);
 
+    const disengageRescue = (targetPatient?: User, navAddress?: string | null) => {
+        if (!acceptingPatientId) return;
+        const patient = targetPatient || users.get(acceptingPatientId);
+        if (patient) {
+            const historyStr = localStorage.getItem('medem_history') || '[]';
+            const history = JSON.parse(historyStr);
+            if (!history.find((h: any) => h.id === "event-" + patient.id && Date.now() - new Date(h.timestamp).getTime() < 300000)) {
+                history.unshift({
+                    id: Date.now().toString(),
+                    targetId: patient.id,
+                    targetName: patient.name,
+                    timestamp: new Date().toISOString(),
+                    location: patient.location,
+                    address: navAddress || null,
+                    userType: 'Doctor',
+                    rating: null
+                });
+                localStorage.setItem('medem_history', JSON.stringify(history));
+                window.dispatchEvent(new Event('history_updated'));
+            }
+        }
+        setAcceptingPatientId(null);
+        setIsAcceptingHelp(false);
+    };
+
+    const handleTargetReached = (target: User, address: string | null) => {
+        disengageRescue(target, address);
+    };
+
+    useEffect(() => {
+        // Did the active patient abort SOS manually?
+        if (acceptingPatientId) {
+            const p = users.get(acceptingPatientId);
+            // If user disappears or drops NeedsCare, conclude it.
+            // But wait! When users disconnect, they might just lose internet. But let's act on needsCare explicit drop.
+            if (p && !p.needsCare) {
+                disengageRescue(p, null);
+            }
+        }
+    }, [users, acceptingPatientId]);
+
     const TargetSelectionBox = nearbyPatients.length > 0 ? (
         <AnimatePresence>
             <motion.div
@@ -253,6 +294,7 @@ export const DoctorHomeView = ({
                             incomingDoctors={incomingDoctors}
                             nearbyPatients={nearbyPatients}
                             acceptingPatientId={acceptingPatientId}
+                            onTargetReached={handleTargetReached}
                             fullscreenOverlay={TargetSelectionBox}
                             centerMapToMe={centerMapToMe}
                         />

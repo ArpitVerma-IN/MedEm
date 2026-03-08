@@ -94,6 +94,7 @@ interface LiveTrackingMapProps {
     acceptingPatientId: string | null;
     fullscreenOverlay?: React.ReactNode;
     centerMapToMe?: () => void;
+    onTargetReached?: (target: User, address: string | null) => void;
 }
 
 export const LiveTrackingMap = ({
@@ -107,7 +108,8 @@ export const LiveTrackingMap = ({
     nearbyPatients,
     acceptingPatientId,
     fullscreenOverlay,
-    centerMapToMe
+    centerMapToMe,
+    onTargetReached
 }: LiveTrackingMapProps) => {
     type MapState = 'collapsed' | 'mini' | 'large';
     const [mapState, setMapState] = useState<MapState>('collapsed');
@@ -161,27 +163,13 @@ export const LiveTrackingMap = ({
     useEffect(() => {
         if (hasReachedTarget && activeTargetUser && reachEventFired.current !== activeTargetUser.id) {
             reachEventFired.current = activeTargetUser.id;
-            const historyStr = localStorage.getItem('medem_history') || '[]';
-            const history = JSON.parse(historyStr);
-            // Deduplicate same event within 5 minutes
-            if (!history.find((h: any) => h.targetId === activeTargetUser.id && (Date.now() - new Date(h.timestamp).getTime() < 300000))) {
-                history.unshift({
-                    id: Date.now().toString(),
-                    targetId: activeTargetUser.id,
-                    targetName: activeTargetUser.name,
-                    timestamp: new Date().toISOString(),
-                    location: activeTargetUser.location,
-                    address: navAddress || null,
-                    userType: userType,
-                    rating: null
-                });
-                localStorage.setItem('medem_history', JSON.stringify(history));
-                window.dispatchEvent(new Event('history_updated'));
+            if (onTargetReached) {
+                onTargetReached(activeTargetUser, navAddress);
             }
         } else if (!hasReachedTarget && activeTargetUser && reachEventFired.current === activeTargetUser.id) {
             reachEventFired.current = null; // Reset if they drift apart
         }
-    }, [hasReachedTarget, activeTargetUser, userType, navAddress]);
+    }, [hasReachedTarget, activeTargetUser, navAddress, onTargetReached]);
 
     // Live Heading Compute
     useEffect(() => {
