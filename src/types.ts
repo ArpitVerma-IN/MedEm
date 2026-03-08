@@ -19,3 +19,14 @@ export interface ChatMessage {
     message: string;
     timestamp: string;
 }
+
+export interface HistoryEvent {
+    id: string;
+    targetId: string;
+    targetName: string;
+    timestamp: string;
+    location: Location;
+    address: string | null;
+    userType: 'Doctor' | 'Patient';
+    rating: number | null;
+}

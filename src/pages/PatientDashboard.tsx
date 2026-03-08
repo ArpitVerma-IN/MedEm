@@ -37,6 +37,7 @@ export const PatientDashboard = () => {
         incomingDoctors,
         messages,
         sendMessage,
+        sendRating,
         triggerJoin,
         setMyLocation
     } = useLiveTracker({
@@ -112,7 +113,7 @@ export const PatientDashboard = () => {
                     {activeTab === 'history' && (
                         <motion.div key="history" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
                             <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
-                                <HistoryView />
+                                <HistoryView sendRating={sendRating} />
                             </Suspense>
                         </motion.div>
                     )}

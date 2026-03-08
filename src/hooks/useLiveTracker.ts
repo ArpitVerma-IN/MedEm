@@ -109,6 +109,20 @@ export const useLiveTracker = ({
             }
         });
 
+        newSocket.on('receive_rating', (data: { senderId: string, rating: number, eventId: string }) => {
+            const historyStr = localStorage.getItem('medem_history') || '[]';
+            const history = JSON.parse(historyStr);
+            
+            // Allow matching by the exact eventId (if shared exactly via both clients) or just fallback to targetId match for latest
+            const eventIndex = history.findIndex((h: any) => h.id === data.eventId || (h.targetId === data.senderId && !h.rating));
+            
+            if (eventIndex !== -1) {
+                history[eventIndex].rating = data.rating;
+                localStorage.setItem('medem_history', JSON.stringify(history));
+                window.dispatchEvent(new Event('history_updated'));
+            }
+        });
+
         newSocket.on('connect', () => {
             const state = stateRef.current;
             if (state.isJoined && state.myLocation && state.name) {
@@ -235,6 +249,12 @@ export const useLiveTracker = ({
         }
     };
 
+    const sendRating = (targetId: string, eventId: string, rating: number) => {
+        if (socket && isJoined) {
+            socket.emit('submit_rating', { targetId, eventId, rating });
+        }
+    };
+
     return {
         socket,
         myLocation,
@@ -243,6 +263,7 @@ export const useLiveTracker = ({
         incomingDoctors,
         messages,
         sendMessage,
+        sendRating,
         triggerJoin,
         setMyLocation
     };

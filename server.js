@@ -69,6 +69,16 @@ io.on('connection', (socket) => {
     }
   });
 
+  socket.on('submit_rating', (data) => {
+    if (data.targetId) {
+      io.to(data.targetId).emit('receive_rating', {
+        senderId: socket.id,
+        rating: data.rating,
+        eventId: data.eventId
+      });
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);
     users.delete(socket.id);

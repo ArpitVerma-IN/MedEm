@@ -126,21 +126,62 @@ export const LiveTrackingMap = ({
     useEffect(() => { latestMyLocation.current = myLocation; }, [myLocation]);
 
     // Track highest-priority target
-    const activeTargetUser = useMemo(() => {
+    const activeTargetInfo = useMemo(() => {
+        if (!myLocation) return null;
+        const myLL = L.latLng(myLocation.lat, myLocation.lng);
         if (userType === 'Doctor') {
-             if (acceptingPatientId) return Array.from(users.values()).find(u => u.id === acceptingPatientId);
-             if (nearbyPatients.length > 0) return nearbyPatients.reduce((prev, curr) => prev.distance < curr.distance ? prev : curr).user;
+             if (acceptingPatientId) {
+                  const u = Array.from(users.values()).find(u => u.id === acceptingPatientId);
+                  if (u && u.location) return { user: u, distance: myLL.distanceTo(L.latLng(u.location.lat, u.location.lng)) };
+                  return null;
+             }
+             if (nearbyPatients.length > 0) return nearbyPatients.reduce((prev, curr) => prev.distance < curr.distance ? prev : curr);
              return null;
         } else {
-             if (incomingDoctors.length > 0) return incomingDoctors.reduce((prev, curr) => prev.distance < curr.distance ? prev : curr).user;
+             if (incomingDoctors.length > 0) return incomingDoctors.reduce((prev, curr) => prev.distance < curr.distance ? prev : curr);
              return null;
         }
-    }, [users, acceptingPatientId, nearbyPatients, incomingDoctors, userType]);
-    
+    }, [users, acceptingPatientId, nearbyPatients, incomingDoctors, userType, myLocation]);
+
+    const activeTargetUser = activeTargetInfo?.user;
+    const activeTargetDistance = activeTargetInfo?.distance;
+    const hasReachedTarget = activeTargetDistance !== undefined && activeTargetDistance <= 40;
+
     const targetLoc = activeTargetUser?.location;
     const targetId = activeTargetUser?.id;
     const latestTargetLoc = useRef(targetLoc);
     useEffect(() => { latestTargetLoc.current = targetLoc; }, [targetLoc]);
+
+    // Shut off nav automatically if reached
+    useEffect(() => {
+        if (hasReachedTarget && isNavEnabled) setIsNavEnabled(false);
+    }, [hasReachedTarget, isNavEnabled]);
+
+    const reachEventFired = useRef<string | null>(null);
+    useEffect(() => {
+        if (hasReachedTarget && activeTargetUser && reachEventFired.current !== activeTargetUser.id) {
+            reachEventFired.current = activeTargetUser.id;
+            const historyStr = localStorage.getItem('medem_history') || '[]';
+            const history = JSON.parse(historyStr);
+            // Deduplicate same event within 5 minutes
+            if (!history.find((h: any) => h.targetId === activeTargetUser.id && (Date.now() - new Date(h.timestamp).getTime() < 300000))) {
+                history.unshift({
+                    id: Date.now().toString(),
+                    targetId: activeTargetUser.id,
+                    targetName: activeTargetUser.name,
+                    timestamp: new Date().toISOString(),
+                    location: activeTargetUser.location,
+                    address: navAddress || null,
+                    userType: userType,
+                    rating: null
+                });
+                localStorage.setItem('medem_history', JSON.stringify(history));
+                window.dispatchEvent(new Event('history_updated'));
+            }
+        } else if (!hasReachedTarget && activeTargetUser && reachEventFired.current === activeTargetUser.id) {
+            reachEventFired.current = null; // Reset if they drift apart
+        }
+    }, [hasReachedTarget, activeTargetUser, userType, navAddress]);
 
     // Live Heading Compute
     useEffect(() => {
@@ -317,6 +358,20 @@ export const LiveTrackingMap = ({
         </>
     );
 
+    const ReachedBanner = hasReachedTarget && activeTargetUser ? (
+        <div className="bg-emerald-600 dark:bg-emerald-700 text-white p-4 rounded-xl shadow-2xl border-2 border-emerald-400 dark:border-emerald-500 animate-in fade-in zoom-in w-full max-w-sm mx-auto text-center font-bold relative z-[9999]">
+            <div className="flex items-center justify-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
+                <span className="text-sm tracking-wider uppercase">Emergency Reached</span>
+            </div>
+            {userType === 'Doctor' ? (
+                <span>You have reached the patient.</span>
+            ) : (
+                <span>Dr. {activeTargetUser.name} has reached your place.</span>
+            )}
+        </div>
+    ) : null;
+
     return (
         <div className="w-full relative flex flex-col pointer-events-none isolate">
             {mapState === 'collapsed' && (
@@ -377,7 +432,8 @@ export const LiveTrackingMap = ({
                             </MapContainer>
                         </div>
                     </div>
-                    {isNavEnabled && navAddress && (
+                    {hasReachedTarget && ReachedBanner}
+                    {isNavEnabled && !hasReachedTarget && navAddress && (
                         <div className="bg-white dark:bg-slate-800 rounded-[1.5rem] p-4 shadow-lg border border-slate-100 dark:border-slate-700 flex items-center gap-3 w-full">
                             <div className="bg-blue-50 dark:bg-blue-900/40 p-2.5 rounded-full shrink-0 border border-blue-100 dark:border-blue-800/60">
                                 <MapPin size={22} className="text-blue-500" strokeWidth={2.5} />
@@ -405,12 +461,16 @@ export const LiveTrackingMap = ({
                         <button onClick={() => setIsMapDark(!isMapDark)} className="bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 hover:scale-105 transition-transform text-slate-800 dark:text-slate-200 cursor-pointer">
                             {isMapDark ? <Sun size={24} strokeWidth={2.5} className="text-amber-500" /> : <Moon size={24} strokeWidth={2.5} />}
                         </button>
-                        <button onClick={() => { if (activeTargetUser) setIsNavEnabled(!isNavEnabled); }} className={`bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 transition-transform cursor-pointer ${isNavEnabled ? 'text-blue-500 hover:scale-105' : 'text-slate-400 dark:text-slate-500'} ${!activeTargetUser ? 'opacity-40 hover:scale-100' : 'hover:scale-105'}`}>
+                        <button onClick={() => { if (activeTargetUser && !hasReachedTarget) setIsNavEnabled(!isNavEnabled); }} className={`bg-white/95 dark:bg-slate-800/95 p-3 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 transition-transform cursor-pointer ${isNavEnabled ? 'text-blue-500 hover:scale-105' : 'text-slate-400 dark:text-slate-500'} ${(!activeTargetUser || hasReachedTarget) ? 'opacity-40 hover:scale-100' : 'hover:scale-105'}`}>
                             {isNavEnabled ? <Navigation size={24} strokeWidth={2.5} /> : <NavigationOff size={24} strokeWidth={2.5} />}
                         </button>
                     </div>
 
-                    {isNavEnabled && navData && navData.steps && navData.steps.length > 0 && (
+                    {hasReachedTarget ? (
+                        <div className="absolute top-8 left-6 z-[6000] pointer-events-auto">
+                            {ReachedBanner}
+                        </div>
+                    ) : (isNavEnabled && navData && navData.steps && navData.steps.length > 0 ? (
                         <div className="absolute top-8 left-6 z-[6000] pointer-events-auto">
                             <div className={`bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-300 flex flex-col ${isNavAssistMinimized ? 'w-14 h-14' : 'w-80'}`}>
                                 {isNavAssistMinimized ? (
@@ -451,7 +511,7 @@ export const LiveTrackingMap = ({
                                 )}
                             </div>
                         </div>
-                    )}
+                    ) : null)}
 
                     <MapContainer
                         center={defaultCenter}
