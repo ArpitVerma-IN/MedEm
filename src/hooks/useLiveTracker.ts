@@ -18,6 +18,7 @@ interface UseLiveTrackerProps {
     needsCare: boolean;
     isAcceptingHelp?: boolean;
     acceptingPatientId?: string | null;
+    geofenceRadius?: number;
     onError: (err: string) => void;
     onJoinSuccess: (loc: UserLocation) => void;
 }
@@ -30,6 +31,7 @@ export const useLiveTracker = ({
     needsCare,
     isAcceptingHelp = false,
     acceptingPatientId = null,
+    geofenceRadius = 2000,
     onError,
     onJoinSuccess
 }: UseLiveTrackerProps) => {
@@ -180,7 +182,7 @@ export const useLiveTracker = ({
                 if (user.userType === 'Patient' && user.needsCare && user.location) {
                     const userLatLng = L.latLng(user.location.lat, user.location.lng);
                     const distance = myLatLng.distanceTo(userLatLng);
-                    if (distance <= 2000) nearby.push({ user, distance });
+                    if (distance <= geofenceRadius) nearby.push({ user, distance });
                 }
             });
             setNearbyPatients(nearby);
@@ -201,7 +203,7 @@ export const useLiveTracker = ({
             }
             setNearbyPatients([]);
         }
-    }, [users, myLocation, isJoined, userType, needsCare, acceptingPatientId, socket]);
+    }, [users, myLocation, isJoined, userType, needsCare, acceptingPatientId, socket, geofenceRadius]);
 
     useEffect(() => {
         if (socket && isJoined) {

@@ -29,6 +29,15 @@ export const DoctorDashboard = () => {
     const [isAcceptingHelp, setIsAcceptingHelp] = useState(false);
     const [acceptingPatientId, setAcceptingPatientId] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('home');
+    const [geofenceRadius, setGeofenceRadius] = useState<number>(() => parseInt(localStorage.getItem('medem_geofence_radius') || '2000'));
+
+    useEffect(() => {
+        const handleGeofenceChange = () => {
+            setGeofenceRadius(parseInt(localStorage.getItem('medem_geofence_radius') || '2000'));
+        };
+        window.addEventListener('geofence_changed', handleGeofenceChange);
+        return () => window.removeEventListener('geofence_changed', handleGeofenceChange);
+    }, []);
 
     const {
         myLocation,
@@ -47,6 +56,7 @@ export const DoctorDashboard = () => {
         needsCare: false,
         isAcceptingHelp,
         acceptingPatientId,
+        geofenceRadius,
         onError: setError,
         onJoinSuccess: () => setIsJoined(true)
     });
