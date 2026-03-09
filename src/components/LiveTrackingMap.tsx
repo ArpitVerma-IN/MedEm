@@ -147,7 +147,10 @@ export const LiveTrackingMap = ({
 
     const activeTargetUser = activeTargetInfo?.user;
     const activeTargetDistance = activeTargetInfo?.distance;
-    const hasReachedTarget = activeTargetDistance !== undefined && activeTargetDistance <= 40;
+    
+    // Explicitly confirm emergency contexts to prevent random passersby triggering Arrival Banners
+    const hasReachedTarget = activeTargetDistance !== undefined && activeTargetDistance <= 40 
+        && (userType === 'Doctor' ? (acceptingPatientId === activeTargetUser?.id && activeTargetUser?.needsCare) : true);
 
     const targetLoc = activeTargetUser?.location;
     const targetId = activeTargetUser?.id;

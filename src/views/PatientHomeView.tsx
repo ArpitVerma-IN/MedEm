@@ -328,12 +328,20 @@ export const PatientHomeView = ({
                                                 <HeartPulse size={48} />
                                             </div>
                                             <div className="flex flex-col gap-1 pr-12 relative z-10 w-full">
-                                                <span className="text-[0.95rem] font-bold text-emerald-800 dark:text-emerald-400">
-                                                    You are currently in the rescue zone of {nearbyDoctorsCount} {nearbyDoctorsCount === 1 ? 'doctor' : 'doctors'}.
-                                                </span>
-                                                <span className="text-[0.8rem] font-medium text-emerald-600 dark:text-emerald-500/80 leading-tight">
-                                                    {nearbyDoctorsCount} {nearbyDoctorsCount === 1 ? 'responder is' : 'responders are'} active on the emergency network nearby you.
-                                                </span>
+                                                {nearbyDoctorsCount === 0 ? (
+                                                    <span className="text-[0.95rem] font-bold text-emerald-800 dark:text-emerald-400">
+                                                        No doctors nearby, try contacting regular channels of help if emergency occurs.
+                                                    </span>
+                                                ) : (
+                                                    <>
+                                                        <span className="text-[0.95rem] font-bold text-emerald-800 dark:text-emerald-400">
+                                                            You are currently in the rescue zone of {nearbyDoctorsCount} {nearbyDoctorsCount === 1 ? 'doctor' : 'doctors'}.
+                                                        </span>
+                                                        <span className="text-[0.8rem] font-medium text-emerald-600 dark:text-emerald-500/80 leading-tight">
+                                                            {nearbyDoctorsCount} {nearbyDoctorsCount === 1 ? 'responder is' : 'responders are'} active on the emergency network nearby you.
+                                                        </span>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                         <NearbyHospitals location={myLocation} mode="standby" />

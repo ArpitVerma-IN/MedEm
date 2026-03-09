@@ -17,6 +17,8 @@
 
 *An interactive, low-latency live map to track and direct emergency responders directly to patients in need.*
 
+**[Overview](#-overview)** | **[Features](#-key-features--architecture)** | **[Installation](#-progressive-web-app-pwa-installation-guide)** | **[Roadmap](#-further-updates--roadmap)** | **[Contributing & Funding](#-contributing--contact)**
+
 </div>
 
 ---
@@ -65,7 +67,7 @@ Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely ind
 - **Frontend Framework:** React 19 + TypeScript (Powered by Vite)
 - **Aesthetic System:** Tailwind CSS v4 + Framer Motion + Lucide-React SVGs
 - **Live Connection Layer:** Socket.IO / WebSockets (Client & Server)
-- **Security:** Native Web Crypto API (AES-GCM Encryption)
+- **Security:** Native Web Crypto API (AES-256-CBC) + Rate Limiting & Auth Tokens
 - **Cartography Engine:** React-Leaflet + Leaflet.js
 - **Backend Infrastructure:** Express server running dynamically on Node.js
 
@@ -203,6 +205,9 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
 ## 🤝 Contributing & Contact
 
 I actively welcome open-source developers to contribute to this project! If you find MedEm's core mission compelling, feel free to submit Pull Requests, or open Issues for new feature suggestions or bug fixes. Let's build a better, faster, and more robust emergency tracking platform together!
+
+### 💖 Support the Project
+If you find this open-source prototype valuable and would like to fund its continued scaling, infrastructure, and server development, please reach out directly to the developer using the contact links below.
 
 Connect with me using the links below:
 
