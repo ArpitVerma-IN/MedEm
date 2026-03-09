@@ -44,13 +44,13 @@ const getDistance = (loc1, loc2) => {
   return R * c;
 };
 
-// Periodic interval to broadcast Doctor proximity to Patients anonymously without leaking location
-setInterval(() => {
+// Function to calculate regional counts
+const triggerNearbyDoctorsHeartbeat = () => {
   let doctors = Array.from(users.values()).filter(u => u.userType === 'Doctor' && u.location);
   
   for (const [id, user] of users.entries()) {
     if (user.userType === 'Patient' && user.location) {
-      // Find how many doctors have this patient in their coverage radius
+      // Find how many doctors have this patient in their coverage radius (1x Zone)
       let doctorsInRadius = doctors.filter(doc => {
         let radius = doc.geofenceRadius || 2000;
         let dist = getDistance(doc.location, user.location);
@@ -59,14 +59,43 @@ setInterval(() => {
       io.to(id).emit('nearby_doctors_count', doctorsInRadius.length);
     }
   }
-}, 30000); // 30 seconds
+};
+
+// Periodic interval to broadcast Doctor proximity to Patients anonymously without leaking location
+setInterval(triggerNearbyDoctorsHeartbeat, 30000); // 30 seconds
+
+// Security wrapper for emitting user location updates only to authorized bounds
+const broadcastSecureLocationUpdate = (senderId, eventName = 'user_updated') => {
+  const sender = users.get(senderId);
+  if (!sender || !sender.location) return;
+
+  if (sender.userType === 'Patient') {
+    // Patients broadcast their ping securely only to Doctors inside a 2x Zone Perimeter
+    for (const [otherId, other] of users.entries()) {
+      if (other.userType === 'Doctor' && other.location) {
+        const radius = other.geofenceRadius || 2000;
+        const dist = getDistance(sender.location, other.location);
+        
+        // 2 * zone perimeter radius condition met:
+        if (dist <= (radius * 2)) {
+          io.to(otherId).emit(eventName, sender);
+        }
+      }
+    }
+  } else if (sender.userType === 'Doctor') {
+    // Doctors broadcast their location only to the patient they are attempting to rescue
+    if (sender.acceptingPatientId) {
+       io.to(sender.acceptingPatientId).emit(eventName, sender);
+    }
+  }
+};
 
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
   // Broadcast to others when a new user joins
   socket.on('join', (data) => {
-    users.set(socket.id, {
+    const newUser = {
       id: socket.id,
       name: data.name,
       location: data.location,
@@ -76,13 +105,35 @@ io.on('connection', (socket) => {
       isAcceptingHelp: data.isAcceptingHelp || false,
       acceptingPatientId: data.acceptingPatientId || null,
       geofenceRadius: data.geofenceRadius || 2000
-    });
+    };
+    users.set(socket.id, newUser);
 
-    // We still emit the users initially, but further locations will be protected.
-    socket.emit('users', Array.from(users.values()));
+    // Initial Sync: Only sync authorized surrounding patients/doctors securely
+    const safeUsers = [];
+    for (const [otherId, other] of users.entries()) {
+      if (otherId === socket.id) continue;
+      
+      if (newUser.userType === 'Doctor') {
+         if (other.userType === 'Patient' && other.location && newUser.location) {
+            const dist = getDistance(newUser.location, other.location);
+            if (dist <= (newUser.geofenceRadius || 2000) * 2) {
+                safeUsers.push(other);
+            }
+         }
+      } else if (newUser.userType === 'Patient') {
+         // Patients strictly only see the doctor currently rescuing them
+         if (other.userType === 'Doctor' && other.acceptingPatientId === newUser.id) {
+             safeUsers.push(other);
+         }
+      }
+    }
+    socket.emit('users', safeUsers);
 
-    // Broadcast the new user to everyone else
-    socket.broadcast.emit('user_joined', users.get(socket.id));
+    // Alert strictly relevant clients that this user joined securely!
+    broadcastSecureLocationUpdate(socket.id, 'user_joined');
+    
+    // Instantly generate the passive doctor count ping
+    triggerNearbyDoctorsHeartbeat();
   });
 
   socket.on('update_location', (data) => {
@@ -90,29 +141,9 @@ io.on('connection', (socket) => {
     if (user) {
       user.location = data.location;
       users.set(socket.id, user);
-
-      // SECURITY UPDATE: We no longer broadcast raw updates globally!
-      // Patients only broadcast to doctors.
-      // Doctors only broadcast to their currently targeted patient.
-      if (user.userType === 'Patient') {
-        if (user.needsCare) {
-          // Find doctors who should see this distress beacon
-          for (const [otherId, other] of users.entries()) {
-            if (other.userType === 'Doctor') {
-              const radius = other.geofenceRadius || 2000;
-              const dist = getDistance(user.location, other.location);
-              if (dist <= radius) {
-                io.to(otherId).emit('user_updated', user);
-              }
-            }
-          }
-        }
-      } else if (user.userType === 'Doctor') {
-        if (user.acceptingPatientId) {
-            // Only leak Doctor location coordinates directly to the accepted Patient
-            io.to(user.acceptingPatientId).emit('user_updated', user);
-        }
-      }
+      
+      // SECURITY UPDATE: Only emit this explicitly verified location path instead of global!
+      broadcastSecureLocationUpdate(socket.id, 'user_updated');
     }
   });
 
@@ -122,10 +153,15 @@ io.on('connection', (socket) => {
       if (data.isAcceptingHelp !== undefined) user.isAcceptingHelp = data.isAcceptingHelp;
       if (data.needsCare !== undefined) user.needsCare = data.needsCare;
       if (data.acceptingPatientId !== undefined) user.acceptingPatientId = data.acceptingPatientId;
+      if (data.geofenceRadius !== undefined) user.geofenceRadius = data.geofenceRadius;
+      
       users.set(socket.id, user);
       
-      // Status updates can be broadcasted openly, but location is the protected factor.
-      socket.broadcast.emit('user_updated', user);
+      // Trigger status pushes down the exact identical secure geographic pipeline
+      broadcastSecureLocationUpdate(socket.id, 'user_updated');
+      
+      // Rerun heartbeat to catch any new state drops
+      triggerNearbyDoctorsHeartbeat();
     }
   });
 
