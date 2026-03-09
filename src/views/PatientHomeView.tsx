@@ -18,6 +18,7 @@ interface PatientHomeViewProps {
     messages: ChatMessage[];
     sendMessage: (targetId: string, message: string) => void;
     centerMapToMe: () => void;
+    nearbyDoctorsCount?: number;
 }
 
 export const PatientHomeView = ({
@@ -31,7 +32,8 @@ export const PatientHomeView = ({
     setNeedsCare,
     messages,
     sendMessage,
-    centerMapToMe
+    centerMapToMe,
+    nearbyDoctorsCount = 0
 }: PatientHomeViewProps) => {
 
     const [isTimeout, setIsTimeout] = useState(false);
@@ -320,9 +322,22 @@ export const PatientHomeView = ({
                                 
                                 {/* Standby view hospital browser stacked directly below normal map */}
                                 {!needsCare && showMap && (
-                                    <div className="w-full flex justify-center pointer-events-auto relative z-[2000] mt-3 pb-4">
+                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full flex flex-col items-center pointer-events-auto relative z-[2000] mt-3 pb-4 gap-3">
+                                        <div className="w-full max-w-md bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-4 flex items-center shadow-sm relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none text-emerald-600 dark:text-emerald-400">
+                                                <HeartPulse size={48} />
+                                            </div>
+                                            <div className="flex flex-col gap-1 pr-12 relative z-10 w-full">
+                                                <span className="text-[0.95rem] font-bold text-emerald-800 dark:text-emerald-400">
+                                                    You are currently in the rescue zone of {nearbyDoctorsCount} {nearbyDoctorsCount === 1 ? 'doctor' : 'doctors'}.
+                                                </span>
+                                                <span className="text-[0.8rem] font-medium text-emerald-600 dark:text-emerald-500/80 leading-tight">
+                                                    {nearbyDoctorsCount} {nearbyDoctorsCount === 1 ? 'responder is' : 'responders are'} active on the emergency network nearby you.
+                                                </span>
+                                            </div>
+                                        </div>
                                         <NearbyHospitals location={myLocation} mode="standby" />
-                                    </div>
+                                    </motion.div>
                                 )}
                             </motion.div>
                         )}

@@ -41,12 +41,13 @@ export const useLiveTracker = ({
     const [nearbyPatients, setNearbyPatients] = useState<{ user: User, distance: number }[]>([]);
     const [incomingDoctors, setIncomingDoctors] = useState<{ user: User, distance: number }[]>([]);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [nearbyDoctorsCount, setNearbyDoctorsCount] = useState<number>(0);
     const watchId = useRef<number | null>(null);
 
-    const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId });
+    const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius });
     useEffect(() => {
-        stateRef.current = { isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId };
-    }, [isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId]);
+        stateRef.current = { isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius };
+    }, [isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius]);
 
     useEffect(() => {
         const getBackendUrl = () => {
@@ -55,8 +56,14 @@ export const useLiveTracker = ({
             return `http://${window.location.hostname}:3001`;
         };
 
-        const newSocket = io(getBackendUrl());
+        const newSocket = io(getBackendUrl(), {
+            auth: { token: "medem-secure-client-2026" }
+        });
         setSocket(newSocket);
+
+        newSocket.on('nearby_doctors_count', (count: number) => {
+            setNearbyDoctorsCount(count);
+        });
 
         newSocket.on('users', (existingUsers: User[]) => {
             const filtered = existingUsers.filter(u => u.id !== newSocket.id);
@@ -133,7 +140,8 @@ export const useLiveTracker = ({
                     userType: state.userType,
                     needsCare: state.needsCare,
                     isAcceptingHelp: state.isAcceptingHelp,
-                    acceptingPatientId: state.acceptingPatientId
+                    acceptingPatientId: state.acceptingPatientId,
+                    geofenceRadius: state.geofenceRadius
                 });
             }
         });
@@ -163,7 +171,7 @@ export const useLiveTracker = ({
                 onJoinSuccess(location);
 
                 if (socket) {
-                    socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId });
+                    socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius });
 
                     watchId.current = navigator.geolocation.watchPosition(
                         (pos) => {
@@ -265,6 +273,7 @@ export const useLiveTracker = ({
         sendMessage,
         sendRating,
         triggerJoin,
-        setMyLocation
+        setMyLocation,
+        nearbyDoctorsCount
     };
 };

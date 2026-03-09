@@ -39,7 +39,8 @@ export const PatientDashboard = () => {
         sendMessage,
         sendRating,
         triggerJoin,
-        setMyLocation
+        setMyLocation,
+        nearbyDoctorsCount
     } = useLiveTracker({
         name,
         userType: 'Patient',
@@ -101,6 +102,7 @@ export const PatientDashboard = () => {
                             messages={messages}
                             sendMessage={sendMessage}
                             centerMapToMe={centerMapToMe}
+                            nearbyDoctorsCount={nearbyDoctorsCount}
                         />
                     )}
                     {activeTab === 'ai' && (
