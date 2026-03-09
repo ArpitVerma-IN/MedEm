@@ -9,9 +9,7 @@ app.use(cors());
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? ["https://medem.netlify.app", "https://medem-network.web.app"] 
-      : "*", 
+    origin: "*", 
     methods: ["GET", "POST"]
   }
 });
