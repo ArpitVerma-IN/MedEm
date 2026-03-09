@@ -202,10 +202,10 @@ export const useLiveTracker = ({
         if (userType === 'Doctor') {
             const nearby: { user: User, distance: number }[] = [];
             Array.from(users.values()).forEach(user => {
-                if (user.userType === 'Patient' && user.needsCare && user.location) {
+                if (user.userType === 'Patient' && user.location) {
                     const userLatLng = L.latLng(user.location.lat, user.location.lng);
                     const distance = myLatLng.distanceTo(userLatLng);
-                    if (distance <= geofenceRadius) nearby.push({ user, distance });
+                    if (distance <= geofenceRadius * 2) nearby.push({ user, distance });
                 }
             });
             setNearbyPatients(nearby);

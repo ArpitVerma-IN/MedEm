@@ -40,6 +40,16 @@ Step 3: Dual-Database Architecture Setup
 - Create separate, secure NoSQL (MongoDB Atlas) or SQL tables (Supabase PostgreSQL) specifically for User App Data (Profiles, Names, Certifications).
 - Enforce strict Row Level Security (RLS) policies so patients can only read their own data, and verified doctors are the only ones permitted to read emergency data streams.
 
+Step 4: Transitioning to JWT Stateless Authentication
+- Move away from the static handshake string (`"medem-secure-client-2026"`).
+- Create a REST API endpoint that securely generates a timed, cryptographically signed JSON Web Token (JWT) on login.
+- Update the WebSocket connection to only accept, decode, and validate the algorithmic signature of the JWT.
+
+Step 5: Database Injection & Storage Safety (For Future Logging)
+- Shift reliance away from `localStorage` for Medical Histories and encounter receipts, as it is vulnerable to local tampering and cache clears.
+- Spin up a secure, properly isolated Database layer (like Supabase/PostgreSQL or MongoDB) for logs.
+- Ensure all communication occurs via secure backend Node logic—the front-end React interface should never touch the database directly.
+
 ----------------------------------------------------------
 PHASE 3: AI Verification & Medical Records Management
 ----------------------------------------------------------

@@ -28,6 +28,37 @@ io.use((socket, next) => {
 
 const users = new Map();
 
+// 1. Data Integrity & Payload Sanitization
+const isValidLocation = (loc) => {
+  if (!loc || typeof loc !== 'object') return false;
+  if (typeof loc.lat !== 'number' || isNaN(loc.lat) || loc.lat < -90 || loc.lat > 90) return false;
+  if (typeof loc.lng !== 'number' || isNaN(loc.lng) || loc.lng < -180 || loc.lng > 180) return false;
+  return true;
+};
+
+const sanitizeString = (str, maxLength = 100) => {
+  if (typeof str !== 'string') return '';
+  return str.replace(/</g, "&lt;").replace(/>/g, "&gt;").trim().substring(0, maxLength);
+};
+
+// 2. DDoS Protection & Rate Limiting (Token Bucket)
+const activeRateLimits = new Map();
+const checkRateLimit = (socketId, eventType, maxEventsPerSecond) => {
+  const now = Date.now();
+  if (!activeRateLimits.has(socketId)) activeRateLimits.set(socketId, {});
+  
+  const userLimits = activeRateLimits.get(socketId);
+  if (!userLimits[eventType]) userLimits[eventType] = [];
+  
+  // Clean up pings older than 1 second
+  userLimits[eventType] = userLimits[eventType].filter(time => now - time < 1000);
+  
+  if (userLimits[eventType].length >= maxEventsPerSecond) return false; // Block request
+  
+  userLimits[eventType].push(now);
+  return true;
+};
+
 // Calculate distance between two points in meters (Haversine formula)
 const getDistance = (loc1, loc2) => {
   if (!loc1 || !loc2) return Infinity;
@@ -95,16 +126,19 @@ io.on('connection', (socket) => {
 
   // Broadcast to others when a new user joins
   socket.on('join', (data) => {
+    if (!checkRateLimit(socket.id, 'join', 1)) return; // Max 1 join attempt per sec
+    if (data.location && !isValidLocation(data.location)) return;
+
     const newUser = {
       id: socket.id,
-      name: data.name,
+      name: sanitizeString(data.name, 50),
       location: data.location,
-      color: data.color,
-      userType: data.userType,
-      needsCare: data.needsCare,
-      isAcceptingHelp: data.isAcceptingHelp || false,
-      acceptingPatientId: data.acceptingPatientId || null,
-      geofenceRadius: data.geofenceRadius || 2000
+      color: sanitizeString(data.color, 20),
+      userType: data.userType === 'Doctor' ? 'Doctor' : 'Patient', // Strict Role Types
+      needsCare: Boolean(data.needsCare),
+      isAcceptingHelp: Boolean(data.isAcceptingHelp),
+      acceptingPatientId: data.acceptingPatientId ? sanitizeString(data.acceptingPatientId, 50) : null,
+      geofenceRadius: typeof data.geofenceRadius === 'number' && !isNaN(data.geofenceRadius) ? data.geofenceRadius : 2000
     };
     users.set(socket.id, newUser);
 
@@ -137,6 +171,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('update_location', (data) => {
+    if (!checkRateLimit(socket.id, 'update_location', 2)) return; // Max 2 GPS tracks per sec
+    if (!data || !isValidLocation(data.location)) return;
+
     const user = users.get(socket.id);
     if (user) {
       user.location = data.location;
@@ -148,6 +185,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('update_status', (data) => {
+    if (!checkRateLimit(socket.id, 'update_status', 2)) return; // Max 2 status clicks per sec
+
     const user = users.get(socket.id);
     if (user) {
       if (data.isAcceptingHelp !== undefined) user.isAcceptingHelp = data.isAcceptingHelp;
@@ -166,21 +205,29 @@ io.on('connection', (socket) => {
   });
 
   socket.on('send_message', (data) => {
+    if (!checkRateLimit(socket.id, 'send_message', 5)) return; // Max 5 messages per sec
+    
     if (data.targetId) {
-      io.to(data.targetId).emit('receive_message', {
+      io.to(sanitizeString(data.targetId, 50)).emit('receive_message', {
         senderId: socket.id,
-        payload: data.payload, // Forward ONLY the encrypted payload block
+        payload: {
+           ciphertext: sanitizeString(data.payload?.ciphertext, 5000),
+           iv: sanitizeString(data.payload?.iv, 100)
+        }, // Enforce structural encryption constraints
+
         timestamp: new Date().toISOString()
       });
     }
   });
 
   socket.on('submit_rating', (data) => {
+    if (!checkRateLimit(socket.id, 'submit_rating', 1)) return; // Max 1 rating per sec
+
     if (data.targetId) {
-      io.to(data.targetId).emit('receive_rating', {
+      io.to(sanitizeString(data.targetId, 50)).emit('receive_rating', {
         senderId: socket.id,
-        rating: data.rating,
-        eventId: data.eventId
+        rating: typeof data.rating === 'number' && !isNaN(data.rating) ? data.rating : 5,
+        eventId: sanitizeString(data.eventId, 100)
       });
     }
   });
@@ -188,6 +235,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);
     users.delete(socket.id);
+    activeRateLimits.delete(socket.id); // Clear memory cache
     io.emit('user_left', socket.id);
   });
 });
