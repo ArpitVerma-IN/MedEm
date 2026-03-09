@@ -31,8 +31,17 @@ const users = new Map();
 // 1. Data Integrity & Payload Sanitization
 const isValidLocation = (loc) => {
   if (!loc || typeof loc !== 'object') return false;
-  if (typeof loc.lat !== 'number' || isNaN(loc.lat) || loc.lat < -90 || loc.lat > 90) return false;
-  if (typeof loc.lng !== 'number' || isNaN(loc.lng) || loc.lng < -180 || loc.lng > 180) return false;
+  
+  // Cast strictly to float to safely handle browser string-mocks
+  const lat = parseFloat(loc.lat);
+  const lng = parseFloat(loc.lng);
+  
+  if (isNaN(lat) || lat < -90 || lat > 90) return false;
+  if (isNaN(lng) || lng < -180 || lng > 180) return false;
+  
+  // Enforce the types natively down the pipeline
+  loc.lat = lat;
+  loc.lng = lng;
   return true;
 };
 
@@ -126,7 +135,7 @@ io.on('connection', (socket) => {
 
   // Broadcast to others when a new user joins
   socket.on('join', (data) => {
-    if (!checkRateLimit(socket.id, 'join', 1)) return; // Max 1 join attempt per sec
+    if (!checkRateLimit(socket.id, 'join', 10)) return; // Max 10 join attempts per sec (React StrictMode mitigation)
     if (data.location && !isValidLocation(data.location)) return;
 
     const newUser = {
@@ -171,7 +180,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('update_location', (data) => {
-    if (!checkRateLimit(socket.id, 'update_location', 2)) return; // Max 2 GPS tracks per sec
+    if (!checkRateLimit(socket.id, 'update_location', 10)) return; // Max 10 GPS tracks per sec (to support rapid tracking watchPosition bursts)
     if (!data || !isValidLocation(data.location)) return;
 
     const user = users.get(socket.id);
@@ -185,7 +194,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('update_status', (data) => {
-    if (!checkRateLimit(socket.id, 'update_status', 2)) return; // Max 2 status clicks per sec
+    if (!checkRateLimit(socket.id, 'update_status', 10)) return; // Max 10 status clicks per sec
 
     const user = users.get(socket.id);
     if (user) {
