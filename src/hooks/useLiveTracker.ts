@@ -182,16 +182,16 @@ export const useLiveTracker = ({
                             setMyLocation(newLocation);
                             socket.emit('update_location', { location: newLocation });
                         },
-                        (err) => console.error(err),
-                        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                        (err) => console.error("Geolocation watch error:", err),
+                        { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
                     );
                 }
             },
             (err) => {
-                onError('Please allow location access to use the app.');
-                console.error(err);
+                onError('Please allow location access. Ensure GPS is enabled.');
+                console.error("Geolocation initial error:", err);
             },
-            { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+            { enableHighAccuracy: true, maximumAge: 10000, timeout: 20000 }
         );
     };
 
