@@ -135,9 +135,7 @@ export const LiveTrackingMap = ({
              if (acceptingPatientId) {
                   const u = Array.from(users.values()).find(u => u.id === acceptingPatientId);
                   if (u && u.location) return { user: u, distance: myLL.distanceTo(L.latLng(u.location.lat, u.location.lng)) };
-                  return null;
              }
-             if (nearbyPatients.length > 0) return nearbyPatients.reduce((prev, curr) => prev.distance < curr.distance ? prev : curr);
              return null;
         } else {
              if (incomingDoctors.length > 0) return incomingDoctors.reduce((prev, curr) => prev.distance < curr.distance ? prev : curr);
@@ -157,10 +155,11 @@ export const LiveTrackingMap = ({
     const latestTargetLoc = useRef(targetLoc);
     useEffect(() => { latestTargetLoc.current = targetLoc; }, [targetLoc]);
 
-    // Shut off nav automatically if reached
+    // Shut off nav automatically if reached or target dropped
     useEffect(() => {
+        if (!activeTargetUser && isNavEnabled) setIsNavEnabled(false);
         if (hasReachedTarget && isNavEnabled) setIsNavEnabled(false);
-    }, [hasReachedTarget, isNavEnabled]);
+    }, [hasReachedTarget, isNavEnabled, activeTargetUser]);
 
     const reachEventFired = useRef<string | null>(null);
     useEffect(() => {

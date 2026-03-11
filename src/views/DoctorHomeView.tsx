@@ -126,7 +126,10 @@ export const DoctorHomeView = ({
         }
     }, [users, acceptingPatientId]);
 
-    const TargetSelectionBox = nearbyPatients.length > 0 ? (
+    // Filter strictly for SOS state so healthy patients don't trigger the UI frame
+    const sosPatients = nearbyPatients.filter(p => p.user.needsCare);
+
+    const TargetSelectionBox = sosPatients.length > 0 || acceptingPatientId ? (
         <AnimatePresence>
             <motion.div
                 initial={{ y: -20, opacity: 0 }}
@@ -140,7 +143,7 @@ export const DoctorHomeView = ({
                     <div className="flex items-center gap-2">
                         <AlertTriangle className="text-danger animate-bounce drop-shadow" size={20} />
                         <span className="text-sm font-extrabold text-slate-800 dark:text-slate-100 tracking-wide">
-                            {nearbyPatients.length} EMERGENCY {nearbyPatients.length === 1 ? 'SIGNAL' : 'SIGNALS'}
+                            {sosPatients.length} EMERGENCY {sosPatients.length === 1 ? 'SIGNAL' : 'SIGNALS'}
                         </span>
                     </div>
                     {acceptingPatientId && (
@@ -173,7 +176,7 @@ export const DoctorHomeView = ({
                             }}
                         >
                             <option value="" className="text-slate-500 font-medium select-none text-center">Tap to assign patient target...</option>
-                            {nearbyPatients.map(p => (
+                            {sosPatients.map(p => (
                                 <option key={p.user.id} value={p.user.id} className="font-bold py-2">
                                     🆘 {p.user.name} ({formatDist(p.distance)} away)
                                 </option>
@@ -184,7 +187,7 @@ export const DoctorHomeView = ({
                         </div>
                     </div>
 
-                    {acceptingPatientId && nearbyPatients.find(p => p.user.id === acceptingPatientId) && (
+                    {acceptingPatientId && users.has(acceptingPatientId) && (
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
@@ -192,7 +195,7 @@ export const DoctorHomeView = ({
                         >
                             <Locate size={16} strokeWidth={3} className="animate-pulse" />
                             <span className="text-[0.8rem] font-black uppercase tracking-wider">
-                                Tracking: {formatDist(nearbyPatients.find(p => p.user.id === acceptingPatientId)!.distance)}
+                                Tracking Target Route
                             </span>
                         </motion.div>
                     )}

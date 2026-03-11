@@ -1,0 +1,65 @@
+MedEm - Core Application Rulesets, Event Protocols & Mechanics Reference
+========================================================================
+
+This file is a source of truth for all location-tracking, real-time routing, UI logic, and functional design requirements in MedEm. Any future security updates, structural refactoring, or feature development MUST strictly verify these rules remain intact.
+
+----------------------------------------------------------
+SYSTEM ROLES & VISIBILITY PROTOCOLS
+----------------------------------------------------------
+
+1. THE PATIENT (Client side rules)
+   - Initial State: Patient connects with `needsCare: false`.
+   - Normal Broadcast: While `needsCare` is false, the patient silently tracks their location and exclusively receives the anonymous `nearby_doctors_count` every 30 seconds from the server to reassure them. They do NOT see doctors on the map or any UI elements related to responders.
+   - SOS Broadcast: Upon pressing the SOS button, `needsCare` updates to `true`. This instantly changes their marker to Red (🆘), allowing the backend to route their location stream to all Doctors within the 2x perimeter.
+   - Responder Acceptance: When a Doctor actively "accepts" the SOS from their UI, the Patient's map receives the Doctor's location coordinates. The UI spawns the "Doctor is approaching" banner and draws the actual Doctor's marker on their map.
+   - Dropped Target: If the Doctor cancels the rescue (drops target), the Patient MUST receive an update reflecting `acceptingPatientId = null`, which hides the Doctor from the patient's map and cleans up navigation logic.
+
+2. THE DOCTOR (Responder side rules)
+   - Initial State: Doctor connects and establishes a Geofence radius (e.g. 2000m).
+   - Visibility: Doctors passively receive WSS location coordinates for ALL nearby patients up to a `2 * GeofenceRadius` distance, regardless of whether the patient is in SOS or normal mode. 
+   - SOS Targeting: The Dropdown Target Selector menu on the Doctor's map MUST strictly filter and render ONLY patients who have explicitly called an SOS (`needsCare: true`). Regular nearby patients must never appear in this dropdown menu.
+   - Navigation Engagement: Automatic target determination for the `Navigation` button relies on the active SOS targeting. The Navigation button should NEVER attempt to target random healthy patients if no SOS rescue is accepted. 
+   - Focused Broadcasting: Once a Doctor accepts an SOS (`acceptingPatientId`), their backend WSS pipeline starts exclusively streaming the Doctor's coordinates directly to that specific Patient. 
+
+----------------------------------------------------------
+THE 40-METER "EMERGENCY REACHED" TRIGGER
+----------------------------------------------------------
+
+1. The Condition
+   - When a Doctor is navigating to a patient, the map actively Calculates the physical Haversine distance between their two coordinates upon every GPS update.
+   - The trigger condition is strictly when `Distance <= 40 meters` AND the Patient physically `needsCare === true` AND the Doctor has explicitly targeted them (`acceptingPatientId === patientID`). 
+   
+2. Firing Sequence (Automated Demobilization)
+   - The UI on both devices immediately displays the "Emergency Reached / Doctor has Reached" green block banner.
+   - The Navigation trajectory automatically terminates and is disabled cleanly.
+   - A highly-detailed JSON Receipt containing the Date, Encrypted names, and Coordinates is generated and prepended to `localStorage('medem_history')`.
+   - The system executes a `setTimeout` for 8 seconds to allow users to read the banner. After 8 seconds:
+      - Patient `needsCare` resets to `false`.
+      - Doctor `isAcceptingHelp` resets to `false`, and `acceptingPatientId` resets to `null`.
+      - Socket.IO fires the updated states back to the Server, naturally demobilizing the SOS trackers from both users' screens simultaneously. 
+
+----------------------------------------------------------
+API & SOCKET SERVER LAYER
+----------------------------------------------------------
+
+1. Rate Limits (Strict Limits vs React StrictMode)
+   - WSS requests strictly map via Token Bucket algorithms. 
+   - To account for React StrictMode `useEffect` double-pings during development and sporadic deep-caching from external browser watchPositions, WSS limiters must allow a buffer of `10 TPS` for `update_location` and `join` packets so legitimate clients don't suffer silent shadowbans.
+   
+2. Payload Casting
+   - All `latitude` and `longitude` fields arriving at the API must be parsed via `parseFloat()` to prevent Javascript `typeof` matching from failing when older browsers convert JSON coordinates to strings.
+
+3. CORS (Cross-Origin Policy)
+   - `cors` origin is set to `*`. This is safe because connection validation isn't origin-based, it rests solely on the hand-shake token parameter (`medem-secure-client-2026`). Relaxed CORS prevents issues when spinning up Vercel/Netlify staging domain URLs.
+
+----------------------------------------------------------
+MAP UI/UX LOGIC
+----------------------------------------------------------
+
+1. Nearest Clinic Auto-Fetch (Overpass API)
+   - Triggers strictly ONLY if the Patient clicks SOS but the server actively reports `0` doctors nearby.
+   - Queries OSM within a 20km radius looking for "clinic/hospital/doctor".
+   - It filters the top 3 and calculates real street-driving distance using `project-osrm.org/driving`.
+
+2. Responsive Dom Map Engine
+   - Because `react-leaflet` heavily mounts heavy static DOM overlays, context menus dynamically use CSS isolation and exact zoom-layers to handle the map toggling (Collapsed -> Mini -> Fullscreen) preventing Z-index bleed.

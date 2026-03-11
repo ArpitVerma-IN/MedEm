@@ -196,6 +196,8 @@ io.on('connection', (socket) => {
 
     const user = users.get(socket.id);
     if (user) {
+      const prevAccepting = user.acceptingPatientId;
+      
       if (data.isAcceptingHelp !== undefined) user.isAcceptingHelp = data.isAcceptingHelp;
       if (data.needsCare !== undefined) user.needsCare = data.needsCare;
       if (data.acceptingPatientId !== undefined) user.acceptingPatientId = data.acceptingPatientId;
@@ -204,6 +206,10 @@ io.on('connection', (socket) => {
       users.set(socket.id, user);
       
       // Trigger status pushes down the exact identical secure geographic pipeline
+      if (user.userType === 'Doctor' && prevAccepting && prevAccepting !== user.acceptingPatientId) {
+         // Doctor dropped the previous patient, we MUST notify them!
+         io.to(prevAccepting).emit('user_updated', user);
+      }
       broadcastSecureLocationUpdate(socket.id, 'user_updated');
       
       // Rerun heartbeat to catch any new state drops
