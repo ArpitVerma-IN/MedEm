@@ -13,6 +13,8 @@ interface DoctorHomeViewProps {
     incomingDoctors: { user: User, distance: number }[];
     nearbyPatients: { user: User, distance: number }[];
     acceptingPatientId: string | null;
+    isActiveResponder: boolean;
+    setIsActiveResponder: (val: boolean) => void;
     setIsAcceptingHelp: (val: boolean) => void;
     setAcceptingPatientId: (id: string | null) => void;
     messages: ChatMessage[];
@@ -28,6 +30,8 @@ export const DoctorHomeView = ({
     incomingDoctors,
     nearbyPatients,
     acceptingPatientId,
+    isActiveResponder,
+    setIsActiveResponder,
     setIsAcceptingHelp,
     setAcceptingPatientId,
     messages,
@@ -266,8 +270,28 @@ export const DoctorHomeView = ({
                 </p>
 
                 {/* SystemAnnouncementPlaceholder Frame */}
-                <div id="SystemAnnouncementPlaceholder" className="w-full empty:hidden mt-4 relative z-10 pointer-events-auto flex flex-col transition-all duration-300">
-                    {/* Placeholder content goes here in the future - currently empty */}
+                <div id="SystemAnnouncementPlaceholder" className="w-full mt-4 relative z-10 pointer-events-auto flex flex-col transition-all duration-300">
+                    <button
+                        onClick={() => setIsActiveResponder(!isActiveResponder)}
+                        className={clsx(
+                            "w-full max-w-md font-bold text-[1.1rem] py-4 px-6 rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 shrink-0 relative z-20 active:scale-95 pointer-events-auto",
+                            isActiveResponder
+                                ? "bg-success text-white hover:bg-success-dark shadow-success/30"
+                                : "bg-danger text-white hover:bg-danger-dark shadow-danger/30"
+                        )}
+                    >
+                        {isActiveResponder ? (
+                            <>
+                                <Activity size={24} />
+                                Accepting Help
+                            </>
+                        ) : (
+                            <>
+                                <AlertTriangle size={24} />
+                                Not Accepting Help
+                            </>
+                        )}
+                    </button>
                 </div>
 
                 {/* Decoration Graphic */}

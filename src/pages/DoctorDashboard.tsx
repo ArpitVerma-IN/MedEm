@@ -27,6 +27,7 @@ export const DoctorDashboard = () => {
 
     const [isJoined, setIsJoined] = useState(false);
     const [isAcceptingHelp, setIsAcceptingHelp] = useState(false);
+    const [isActiveResponder, setIsActiveResponder] = useState(true);
     const [acceptingPatientId, setAcceptingPatientId] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('home');
     const [geofenceRadius, setGeofenceRadius] = useState<number>(() => parseInt(localStorage.getItem('medem_geofence_radius') || '2000'));
@@ -55,6 +56,7 @@ export const DoctorDashboard = () => {
         isJoined,
         needsCare: false,
         isAcceptingHelp,
+        isActiveResponder,
         acceptingPatientId,
         geofenceRadius,
         onError: setError,
@@ -108,8 +110,10 @@ export const DoctorDashboard = () => {
                             incomingDoctors={incomingDoctors}
                             nearbyPatients={nearbyPatients}
                             acceptingPatientId={acceptingPatientId}
-                            setAcceptingPatientId={setAcceptingPatientId}
+                            isActiveResponder={isActiveResponder}
+                            setIsActiveResponder={setIsActiveResponder}
                             setIsAcceptingHelp={setIsAcceptingHelp}
+                            setAcceptingPatientId={setAcceptingPatientId}
                             messages={messages}
                             sendMessage={sendMessage}
                             centerMapToMe={centerMapToMe}

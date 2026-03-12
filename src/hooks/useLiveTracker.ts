@@ -17,6 +17,7 @@ interface UseLiveTrackerProps {
     isJoined: boolean;
     needsCare: boolean;
     isAcceptingHelp?: boolean;
+    isActiveResponder?: boolean;
     acceptingPatientId?: string | null;
     geofenceRadius?: number;
     onError: (err: string) => void;
@@ -30,6 +31,7 @@ export const useLiveTracker = ({
     isJoined,
     needsCare,
     isAcceptingHelp = false,
+    isActiveResponder = true,
     acceptingPatientId = null,
     geofenceRadius = 2000,
     onError,
@@ -44,10 +46,10 @@ export const useLiveTracker = ({
     const [nearbyDoctorsCount, setNearbyDoctorsCount] = useState<number>(0);
     const watchId = useRef<number | null>(null);
 
-    const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius });
+    const stateRef = useRef({ isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, isActiveResponder, acceptingPatientId, geofenceRadius });
     useEffect(() => {
-        stateRef.current = { isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius };
-    }, [isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius]);
+        stateRef.current = { isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, isActiveResponder, acceptingPatientId, geofenceRadius };
+    }, [isJoined, myLocation, name, myColor, userType, needsCare, isAcceptingHelp, isActiveResponder, acceptingPatientId, geofenceRadius]);
 
     useEffect(() => {
         const getBackendUrl = () => {
@@ -140,6 +142,7 @@ export const useLiveTracker = ({
                     userType: state.userType,
                     needsCare: state.needsCare,
                     isAcceptingHelp: state.isAcceptingHelp,
+                    isActiveResponder: state.isActiveResponder,
                     acceptingPatientId: state.acceptingPatientId,
                     geofenceRadius: state.geofenceRadius
                 });
@@ -171,7 +174,7 @@ export const useLiveTracker = ({
                 onJoinSuccess(location);
 
                 if (socket) {
-                    socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare, isAcceptingHelp, acceptingPatientId, geofenceRadius });
+                    socket.emit('join', { name: name.trim(), location, color: myColor, userType, needsCare, isAcceptingHelp, isActiveResponder, acceptingPatientId, geofenceRadius });
 
                     watchId.current = navigator.geolocation.watchPosition(
                         (pos) => {
@@ -230,9 +233,9 @@ export const useLiveTracker = ({
 
     useEffect(() => {
         if (socket && isJoined) {
-            socket.emit('update_status', { isAcceptingHelp, needsCare, acceptingPatientId });
+            socket.emit('update_status', { isAcceptingHelp, isActiveResponder, needsCare, acceptingPatientId });
         }
-    }, [isAcceptingHelp, needsCare, acceptingPatientId, socket, isJoined]);
+    }, [isAcceptingHelp, isActiveResponder, needsCare, acceptingPatientId, socket, isJoined]);
 
     const sendMessage = (targetId: string, message: string) => {
         if (socket && isJoined) {

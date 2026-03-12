@@ -84,7 +84,7 @@ const getDistance = (loc1, loc2) => {
 
 // Function to calculate regional counts
 const triggerNearbyDoctorsHeartbeat = () => {
-  let doctors = Array.from(users.values()).filter(u => u.userType === 'Doctor' && u.location);
+  let doctors = Array.from(users.values()).filter(u => u.userType === 'Doctor' && u.location && u.isActiveResponder !== false);
   
   for (const [id, user] of users.entries()) {
     if (user.userType === 'Patient' && user.location) {
@@ -121,8 +121,8 @@ const broadcastSecureLocationUpdate = (senderId, eventName = 'user_updated') => 
       }
     }
   } else if (sender.userType === 'Doctor') {
-    // Doctors broadcast their location only to the patient they are attempting to rescue
-    if (sender.acceptingPatientId) {
+    // Doctors broadcast their location only to the patient they are attempting to rescue, AND only if they are actively accepting help requests
+    if (sender.acceptingPatientId && sender.isActiveResponder !== false) {
        io.to(sender.acceptingPatientId).emit(eventName, sender);
     }
   }
@@ -144,6 +144,7 @@ io.on('connection', (socket) => {
       userType: data.userType === 'Doctor' ? 'Doctor' : 'Patient', // Strict Role Types
       needsCare: Boolean(data.needsCare),
       isAcceptingHelp: Boolean(data.isAcceptingHelp),
+      isActiveResponder: data.isActiveResponder !== undefined ? Boolean(data.isActiveResponder) : true,
       acceptingPatientId: data.acceptingPatientId ? sanitizeString(data.acceptingPatientId, 50) : null,
       geofenceRadius: typeof data.geofenceRadius === 'number' && !isNaN(data.geofenceRadius) ? data.geofenceRadius : 2000
     };
@@ -199,6 +200,7 @@ io.on('connection', (socket) => {
       const prevAccepting = user.acceptingPatientId;
       
       if (data.isAcceptingHelp !== undefined) user.isAcceptingHelp = data.isAcceptingHelp;
+      if (data.isActiveResponder !== undefined) user.isActiveResponder = data.isActiveResponder;
       if (data.needsCare !== undefined) user.needsCare = data.needsCare;
       if (data.acceptingPatientId !== undefined) user.acceptingPatientId = data.acceptingPatientId;
       if (data.geofenceRadius !== undefined) user.geofenceRadius = data.geofenceRadius;

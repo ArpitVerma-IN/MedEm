@@ -11,6 +11,7 @@ export interface User {
     userType: 'Doctor' | 'Patient';
     needsCare: boolean;
     isAcceptingHelp?: boolean;
+    isActiveResponder?: boolean;
     acceptingPatientId?: string | null;
 }
 

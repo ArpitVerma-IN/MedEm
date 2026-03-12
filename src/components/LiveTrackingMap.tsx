@@ -319,7 +319,7 @@ export const LiveTrackingMap = ({
                 if (userType === 'Doctor') {
                     const match = nearbyPatients.find(p => p.user.id === user.id);
                     if (match) {
-                        isFlickering = true;
+                        isFlickering = user.needsCare;
                         distanceStr = ` (${formatDist(match.distance)})`;
                     }
                 }
