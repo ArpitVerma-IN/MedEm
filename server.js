@@ -116,7 +116,13 @@ const broadcastSecureLocationUpdate = (senderId, eventName = 'user_updated') => 
         
         // 2 * zone perimeter radius condition met:
         if (dist <= (radius * 2)) {
-          io.to(otherId).emit(eventName, sender);
+          if (sender.needsCare && other.isActiveResponder === false) {
+            // Mask the SOS state so the inactive responder just sees a normal marker instead of an emergency signal
+            const maskedSender = { ...sender, needsCare: false };
+            io.to(otherId).emit(eventName, maskedSender);
+          } else {
+            io.to(otherId).emit(eventName, sender);
+          }
         }
       }
     }
@@ -159,7 +165,11 @@ io.on('connection', (socket) => {
          if (other.userType === 'Patient' && other.location && newUser.location) {
             const dist = getDistance(newUser.location, other.location);
             if (dist <= (newUser.geofenceRadius || 2000) * 2) {
-                safeUsers.push(other);
+                if (other.needsCare && newUser.isActiveResponder === false) {
+                   safeUsers.push({ ...other, needsCare: false });
+                } else {
+                   safeUsers.push(other);
+                }
             }
          }
       } else if (newUser.userType === 'Patient') {

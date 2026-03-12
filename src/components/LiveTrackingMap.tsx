@@ -92,6 +92,7 @@ interface LiveTrackingMapProps {
     incomingDoctors: { user: User, distance: number }[];
     nearbyPatients: { user: User, distance: number }[];
     acceptingPatientId: string | null;
+    isActiveResponder?: boolean;
     fullscreenOverlay?: React.ReactNode;
     centerMapToMe?: () => void;
     onTargetReached?: (target: User, address: string | null) => void;
@@ -107,6 +108,7 @@ export const LiveTrackingMap = ({
     incomingDoctors,
     nearbyPatients,
     acceptingPatientId,
+    isActiveResponder = true,
     fullscreenOverlay,
     centerMapToMe,
     onTargetReached
@@ -316,16 +318,18 @@ export const LiveTrackingMap = ({
                 let isFlickering = false;
                 let distanceStr = '';
 
+                let roleType: 'Doctor' | 'Patient' | 'SOS' = user.userType === 'Doctor' ? 'Doctor' : 'Patient';
+                
                 if (userType === 'Doctor') {
                     const match = nearbyPatients.find(p => p.user.id === user.id);
                     if (match) {
-                        isFlickering = user.needsCare;
+                        isFlickering = isActiveResponder && user.needsCare;
                         distanceStr = ` (${formatDist(match.distance)})`;
                     }
+                    if (isActiveResponder && user.needsCare) roleType = 'SOS';
+                } else if (userType === 'Patient') {
+                    if (user.needsCare) roleType = 'SOS';
                 }
-
-                let roleType: 'Doctor' | 'Patient' | 'SOS' = user.userType === 'Doctor' ? 'Doctor' : 'Patient';
-                if (user.needsCare) roleType = 'SOS';
 
                 return (
                     <Marker

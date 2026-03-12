@@ -130,8 +130,8 @@ export const DoctorHomeView = ({
         }
     }, [users, acceptingPatientId]);
 
-    // Filter strictly for SOS state so healthy patients don't trigger the UI frame
-    const sosPatients = nearbyPatients.filter(p => p.user.needsCare);
+    // Filter strictly for SOS state AND actively responding status so UI hides signals when switched off
+    const sosPatients = isActiveResponder ? nearbyPatients.filter(p => p.user.needsCare) : [];
 
     const TargetSelectionBox = sosPatients.length > 0 || acceptingPatientId ? (
         <AnimatePresence>
@@ -321,6 +321,7 @@ export const DoctorHomeView = ({
                             incomingDoctors={incomingDoctors}
                             nearbyPatients={nearbyPatients}
                             acceptingPatientId={acceptingPatientId}
+                            isActiveResponder={isActiveResponder}
                             onTargetReached={handleTargetReached}
                             fullscreenOverlay={TargetSelectionBox}
                             centerMapToMe={centerMapToMe}
