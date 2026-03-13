@@ -12,9 +12,9 @@ interface AuthState {
 }
 
 interface AuthContextType extends AuthState {
-    login: (credentials: any) => Promise<void>;
+    login: (credentials: Record<string, string>) => Promise<void>;
     logout: () => Promise<void>;
-    register: (details: any) => Promise<void>;
+    register: (details: Record<string, string>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,8 +27,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     // TODO: Implement actual authentication logic here in Phase 2
-    const login = async (credentials: any) => {
+    const login = async (credentials: Record<string, string>) => {
         // Implement login (Supabase auth.signInWithPassword etc.)
+        // Ensure default `isActiveResponder` and `needsCare` states are retrieved and set properly here.
         setState(prev => ({ ...prev, isLoading: true }));
         console.log("Login not yet implemented", credentials);
     };
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("Logout not yet implemented");
     };
 
-    const register = async (details: any) => {
+    const register = async (details: Record<string, string>) => {
         // Implement registration
         console.log("Register not yet implemented", details);
     };

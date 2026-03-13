@@ -2,13 +2,15 @@
 // This controller will wrap Google Gemini or OpenAI LLM capabilities to 
 // summarize and verify patient medical histories dynamically for responders.
 
+import type { HistoryEvent } from '../types';
+
 export interface AIAnalysisResult {
     summary: string;
     criticalFlags: string[];
     confidence: number;
 }
 
-export const generateEmergencySummary = async (patientRecords: any): Promise<AIAnalysisResult> => {
+export const generateEmergencySummary = async (patientRecords: HistoryEvent[]): Promise<AIAnalysisResult> => {
     // 1. Send data securely to AI Inference endpoint.
     // 2. Instruct LLM to generate rapid "Emergency Context summaries" for the Responder.
 
