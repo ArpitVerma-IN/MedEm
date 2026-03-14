@@ -202,6 +202,17 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
 
 ---
 
+## 🤖 AI Assist API Keys (Phase 3)
+
+MedEm's upcoming Phase 3 AI Inference Engine utilizes a 2-stage roll-out architecture. To use the **MVP / Demo Mode**, you can securely supply your own LLM API Key in the Patient Account Settings. Your key is stored securely in your local browser storage and is never sent to our servers.
+
+To generate your own API key to use with the MedEm AI Assistant, click on the respective provider below:
+*  **[Google Gemini (Recommended & Free Tier)](https://aistudio.google.com/app/apikey)**
+*  **[Anthropic Claude](https://console.anthropic.com/)**
+*  **[OpenAI](https://platform.openai.com/api-keys)**
+
+---
+
 ## 🤝 Contributing & Contact
 
 I actively welcome open-source developers to contribute to this project! If you find MedEm's core mission compelling, feel free to submit Pull Requests, or open Issues for new feature suggestions or bug fixes. Let's build a better, faster, and more robust emergency tracking platform together!

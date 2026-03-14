@@ -63,3 +63,20 @@ MAP UI/UX LOGIC
 
 2. Responsive Dom Map Engine
    - Because `react-leaflet` heavily mounts heavy static DOM overlays, context menus dynamically use CSS isolation and exact zoom-layers to handle the map toggling (Collapsed -> Mini -> Fullscreen) preventing Z-index bleed.
+
+----------------------------------------------------------
+PHASE 3: AI ASSISTED MEDICAL REPORTS (2-STAGE ARCHITECTURE)
+----------------------------------------------------------
+
+1. Stage 1: MVP / Demo Mode (Pathway A - BYOK)
+   - Cost-effective open-source architecture where users supply their own LLM API Keys (Gemini, OpenAI, Claude).
+   - Keys are encrypted and securely stored in local browser `localStorage`.
+   - AI Inference requests are dispatched directly from the React Frontend (`src/services/ai.ts`) to the respective AI provider's API.
+   - Node backend is entirely bypassed to minimize infrastructure overhead.
+
+2. Stage 2: Production / Scale Mode (Pathway B - Backend Proxy)
+   - High-reliability, enterprise architecture utilizing native in-house API proxies.
+   - The React UI sends the medical document directly to the MedEm Node Backend.
+   - The Node server securely injects its Master API Key, executes strict System Prompts dynamically, and queries the AI securely.
+   - The result is sent back to the client and simultaneously cached into the MedEm Database for 0-latency future retrieval.
+   - Transitioning from Stage 1 -> Stage 2 only requires modifying the endpoint URL inside the `generateEmergencySummary()` Facade function, leaving the UI components completely untouched.
