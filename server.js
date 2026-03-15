@@ -224,6 +224,21 @@ io.on('connection', (socket) => {
       }
       broadcastSecureLocationUpdate(socket.id, 'user_updated');
       
+      // If a Doctor just switched to "isActiveResponder = true", they need to instantly receive 
+      // the real-time unmasked `needsCare` states of any SOS patients currently in their vicinity.
+      if (user.userType === 'Doctor' && user.isActiveResponder === true && user.location) {
+          const radius = user.geofenceRadius || 2000;
+          for (const [otherId, other] of users.entries()) {
+              if (other.userType === 'Patient' && other.location && other.needsCare) {
+                  const dist = getDistance(user.location, other.location);
+                  if (dist <= (radius * 2)) {
+                      // Explicitly transmit the unmasked patient payload back to this specific doctor
+                      socket.emit('user_updated', other);
+                  }
+              }
+          }
+      }
+
       // Rerun heartbeat to catch any new state drops
       triggerNearbyDoctorsHeartbeat();
     }
