@@ -2,7 +2,7 @@
 // This controller will wrap Google Gemini or OpenAI LLM capabilities to 
 // summarize and verify patient medical histories dynamically for responders.
 
-import type { HistoryEvent } from '../types';
+import type { HistoryEvent } from '../../../types';
 
 export interface AIAnalysisResult {
     summary: string;

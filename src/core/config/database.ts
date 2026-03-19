@@ -2,7 +2,7 @@
 // This file acts as the configuration and initialization boilerplate for the target 
 // secure database layer, such as Supabase / Firebase / Postgres via pg-promise etc.
 
-import type { User, HistoryEvent } from '../types';
+import type { User, HistoryEvent } from '../../types';
 
 export const initializeSecureDataLayer = () => {
     // TODO: Phase 2 Implementation

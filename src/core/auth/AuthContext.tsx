@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { User } from '../types';
+import type { User } from '../../types';
 
 // Phase 2: Authentication Context Boilerplate
 // This file will handle the state for logged-in users, tokens, and OAuth flows (e.g., Supabase, Firebase).
