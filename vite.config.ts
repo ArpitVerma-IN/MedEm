@@ -15,15 +15,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        manualChunks(id: string) {
-          if (id.includes('node_modules')) {
-            if (id.includes('leaflet') || id.includes('react-leaflet')) return 'leaflet-vendor';
-            if (id.includes('lucide-react')) return 'icons-vendor';
-            if (id.includes('framer-motion')) return 'framer-vendor';
-            if (id.includes('socket.io')) return 'socket-vendor';
-            if (id.includes('crypto-browserify') || id.includes('stream-browserify') || id.includes('buffer') || id.includes('events') || id.includes('vite-plugin-node-polyfills')) return 'polyfills-vendor';
-          }
-          if (id.includes('src/components/LiveTrackingMap')) return 'LiveTrackingMap';
+        manualChunks: {
+          'leaflet-vendor': ['leaflet', 'react-leaflet'],
+          'icons-vendor': ['lucide-react'],
+          'framer-vendor': ['framer-motion'],
+          'socket-vendor': ['socket.io-client'],
         }
       }
     }
