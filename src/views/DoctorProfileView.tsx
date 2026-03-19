@@ -19,8 +19,15 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
 
     const handleLogout = () => {
         if (window.confirm("Are you sure you want to log out?")) {
-            localStorage.removeItem('medem_guest_name');
-            localStorage.removeItem('medem_guest_type');
+            // Completely wipe all sensitive guest session data to protect privacy across shared devices
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('medem_')) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
             navigate('/');
         }
     };
