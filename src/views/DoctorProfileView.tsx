@@ -11,6 +11,7 @@ import { AppSettings } from './responder-settings/AppSettings';
 import { AccountSettings } from './responder-settings/AccountSettings';
 import { AboutMedEm } from './responder-settings/AboutMedEm';
 import { PrivacyPolicy } from './responder-settings/PrivacyPolicy';
+import { PrivacyDashboard } from '../features/settings/ui/PrivacyDashboard';
 
 export const DoctorProfileView = ({ name }: { name: string }) => {
     const navigate = useNavigate();
@@ -60,9 +61,10 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
                         { label: 'Responder Settings', icon: UserCog, color: 'text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30' },
                         { label: 'Alert Preferences', icon: Bell, color: 'text-orange-500 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30' },
                         { label: 'App Settings', icon: Settings, color: 'text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800' },
+                        { label: 'Privacy & Security Data', icon: Shield, color: 'text-purple-500 bg-purple-50 dark:bg-purple-900/30' },
                         { label: 'About MedEm', icon: Info, color: 'text-sky-500 bg-sky-50 dark:bg-sky-900/30' },
-                        { label: 'Privacy Policy', icon: Shield, color: 'text-purple-500 bg-purple-50 dark:bg-purple-900/30' },
-                        { label: 'Account Settings', icon: ShieldAlert, color: 'text-danger-500 bg-danger-50 dark:bg-danger-900/30' },
+                        { label: 'Compliance Policies', icon: ShieldAlert, color: 'text-purple-500 bg-purple-50 dark:bg-purple-900/30' },
+                        { label: 'Account Settings', icon: UserCog, color: 'text-danger-500 bg-danger-50 dark:bg-danger-900/30' },
                         {
                             label: `Theme: ${mode.charAt(0).toUpperCase() + mode.slice(1)}`,
                             icon: mode === 'system' ? Monitor : mode === 'dark' ? Moon : Sun,
@@ -103,9 +105,10 @@ export const DoctorProfileView = ({ name }: { name: string }) => {
                 {activePage === 'Responder Settings' && <SettingsSubView title="Responder Profile" onBack={() => setActivePage(null)}><ResponderSettings /></SettingsSubView>}
                 {activePage === 'Alert Preferences' && <SettingsSubView title="Notifications" onBack={() => setActivePage(null)}><AlertPreferences /></SettingsSubView>}
                 {activePage === 'App Settings' && <SettingsSubView title="App Settings" onBack={() => setActivePage(null)}><AppSettings /></SettingsSubView>}
-                {activePage === 'About MedEm' && <SettingsSubView title="About MedEm" onBack={() => setActivePage(null)}><AboutMedEm /></SettingsSubView>}
-                {activePage === 'Privacy Policy' && <SettingsSubView title="Privacy Policy" onBack={() => setActivePage(null)}><PrivacyPolicy /></SettingsSubView>}
-                {activePage === 'Account Settings' && <SettingsSubView title="Account Settings" onBack={() => setActivePage(null)}><AccountSettings /></SettingsSubView>}
+                { activePage === 'About MedEm' && <SettingsSubView title="About MedEm" onBack={() => setActivePage(null)}><AboutMedEm /></SettingsSubView> }
+                { activePage === 'Compliance Policies' && <SettingsSubView title="Compliance Policies" onBack={() => setActivePage(null)}><PrivacyPolicy /></SettingsSubView> }
+                { activePage === 'Privacy & Security Data' && <SettingsSubView title="Data & Security" onBack={() => setActivePage(null)}><PrivacyDashboard isGuest={true} /></SettingsSubView> }
+                { activePage === 'Account Settings' && <SettingsSubView title="Account Settings" onBack={() => setActivePage(null)}><AccountSettings /></SettingsSubView> }
             </AnimatePresence>
         </>
     );
