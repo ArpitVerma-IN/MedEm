@@ -4,6 +4,31 @@ Welcome to the developer documentation for MedEm. This guide contains intricate 
 
 ---
 
+## 🏗️ Core Architecture & Technical Specifications
+
+MedEm is an advanced minimum viable prototype designed to evaluate live-tracking infrastructure at scale. By pairing strict **HTML5 Geolocation** pipelines directly with persistent **WebSockets**, it enables real-time sub-second coordinate streaming between decoupled client devices.
+
+### 1. Emergency Broadcast System & Geofencing
+- **Stateful Role Context:** The application distinctively mounts either a Patient or Doctor React tree based on the initial authenticated state.
+- **Dynamic SOS Radius:** Responders configure geospatial operating bounds (`500m Urban`, `1km Semi-Urban`, or `2km Rural`). Patient SOS payloads are strictly evaluated against these geofences on the backend utilizing Haversine distance formulas before broadcasting to specific Socket.io rooms, ensuring O(n) targeted socket emission rather than O(n^2) global network flooding.
+- **Automated Lifecycle Disengagement:** When a responding doctor's GPS coordinates intersect within a `40-meter` physical geofence of the tracking patient, system intelligence automatically disengages the SOS state on both clients, destructs active Socket stream listeners, and commits a secure 10-star rating receipt to the persistent history layer.
+- **Density Heartbeats:** When an SOS is inactive, the tracking module calculates regional coverage density via anonymous heartbeat pings. It renders a real-time awareness banner (e.g., `In the rescue zone of 3 doctors`) directly onto the Patient DOM without ever exposing precise Responder Lat/Lng matrices to the public.
+
+### 2. Live Navigation Assist (OSRM & Nominatim)
+- **Live Polyline Routing:** Responders activating navigation trigger the `Project OSRM API` to calculate and map a highly visible SVG trajectory tracing the fastest road network route to the targeted coordinates.
+- **Smart Clinic Locator:** If a Patient SOS finds no active responders, the engine dynamically queries OpenStreetMap via the advanced `Overpass API` for verified medical entities (`amenity=hospital | clinic`) within a 20km radius. Results are piped through the OSRM Driving Distance API, sorted by real driving distance, and injected into the Patient UI.
+- **Optimized Leaflet Map Switching:** The CartoDB vector map transitions mathematically through *Collapsed*, *Mini-Modal*, and *Fullscreen* heights. A Memory Conservation Cache actively pauses and destructs heavy Leaflet DOM elements 30 seconds after navigation is toggled off to resolve memory leakage on low-end mobile devices.
+
+### 3. AES-256-CBC End-to-End Encryption (E2EE)
+- **Private Medical Sockets:** All real-time messaging is secured utilizing a polymorphic drop-in of the native NodeJS `crypto` module, safely executing over Vite polyfills within the browser sandbox. Chat strings are cryptographically converted into unreadable AES-256-CBC ciphertext inside the client's memory *before* transmission. The WebSocket Node server operates strictly as a blind relay schema, entirely incapable of reading the payloads.
+- **Hardened Origin Configurations:** The live Socket server is locked down utilizing origin `cors` protection mechanisms masking out unrecognized headers. Real-time data routing prevents bad actors from sweeping broad latitude/longitude data.
+
+### 4. Progressive Dashboard & Offline Capabilities
+- **Modular Code-Splitting:** Features massive JavaScript bundle minimizations using `React.lazy` and strict `<Suspense>` boundaries. Heavy interactive maps, 3rd party SDKs, and history logs are decoupled from the main thread and lazy-loaded only when explicitly invoked, enabling lightning-fast initial TTFB (Time To First Byte).
+- **Workbox Service Workers:** Custom `vite-plugin-pwa` configurations generate Google Workbox deployment agents that aggressively cache the application shell and React bundles inside the browser's hidden storage. This ensures the app UI instantly boots completely offline, bypassing cellular network latency entirely.
+
+---
+
 ## 🚀 How to Deploy (Step-by-Step)
 
 > [!WARNING]
