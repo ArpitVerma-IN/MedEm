@@ -3,7 +3,7 @@
 <img src="public/logo.svg" width="120" style="margin-bottom: 20px;" alt="MedEm Logo"/>
 
 # 🚑 MedEm: Emergency Responder Prototype
-**A High-Performance Real-Time Location Tracking Application**
+**A Fast, Real-Time Location Tracking Application for Medical Emergencies**
 
 [![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
@@ -14,10 +14,12 @@
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Socket.IO](https://img.shields.io/badge/Socket.io-010101?style=for-the-badge&logo=socket.io&logoColor=white)](https://socket.io/)
 [![Web Crypto API](https://img.shields.io/badge/Web_Crypto_API-000000?style=for-the-badge&logo=w3c&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API)
+[![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
+[![Workbox](https://img.shields.io/badge/Workbox-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://developer.chrome.com/docs/workbox/)
 
-*An interactive, low-latency live map to track and direct emergency responders directly to patients in need.*
+*Instantly connect with nearby emergency responders and stream your live location when you need help the most.*
 
-**[Overview](#-overview)** | **[Features](#-key-features--architecture)** | **[Installation Guide](#-progressive-web-app-pwa-installation-guide)** | **[For Developers](#%EF%B8%8F-for-developers--contributors)** | **[Contributing](#-contributing--contact)**
+**[Overview](#-overview)** | **[Features](#-key-features)** | **[Installation Guide](#-how-to-install-the-app-pwa)** | **[For Developers](#%EF%B8%8F-for-developers--contributors)**
 
 </div>
 
@@ -25,100 +27,66 @@
 
 ## 📖 Overview
 
-**MedEm** is an advanced minimum viable prototype for evaluating live-tracking infrastructure in large-scale medical applications. 
+**MedEm** is an emergency tracking application designed to save lives by cutting down emergency response times. It instantly connects **Patients** in need with the closest available **Medical Responders** (Doctors/Nurses) on an interactive live map.
 
-By pairing blazing-fast **HTML5 Geolocation** directly with **WebSockets**, it enables multiple remote users (Doctors and Patients) to stream their exact cross-global coordinates securely onto a dynamic leaflet map in real-time. 
-
-Recently, MedEm achieved **Phase 1 UI/UX** modernization—boasting entirely independent, mobile-first responsive dashboards tailored explicitly for Patients and Responders using Tailwind CSS v4 and Framer Motion. This major update introduced persistent guest authentication, interactive sub-settings views, dynamic system dark/light theming, modular code-splitting for optimal performance across device capabilities, intelligent lazy loading for heavy component routes, and foundational tracking map enhancements fixing canvas responsiveness.
+Using fast, modern web technologies, MedEm creates a seamless and secure connection between those needing help and those able to give it.
 
 ---
 
-## ✨ Key Features & Architecture
+## ✨ Key Features
 
-### 📱 Independent Mobile-First Dashboards
-- **Patient Portal:** A calming, deeply-colored indigo ecosystem focused on ease of use. Features a massive central "Medical Care" SOS button, an elastic Live Map that dynamically expands/minimizes, and an intuitive bottom navigation bar.
-- **Responder (Doctor) Portal:** A high-contrast emerald interface built for rapid triage. It automatically pulls active SOS signals into a floating targeting console, allowing Doctors to instantly lock onto a patient's exact location.
+### 🆘 For Patients (Send an SOS)
+- **One-Tap Emergency Alert:** Simply press the big red SOS button to instantly alert all verified medical professionals near your location.
+- **Smart Clinic Locator:** If no responders are nearby, the app automatically finds and routes you to the Top 3 nearest hospitals or medical clinics.
+- **Secure Communication:** Once a responder accepts your SOS, you can safely chat and share vital details. All messages are completely encrypted.
 
-### 🚑 Emergency Broadcast System (Interactive Geofencing)
-- **Role Detection:** Upon login, users distinctly select to join as either a **Patient** or a **Doctor**.
-- **Personalized SOS Radius:** Responders can explicitly set their operating bounds (`500m Urban`, `1km Semi-Urban`, or `2km Rural`) via the Responder Settings UI. Patient `"need medical care!"` SOS broadcasts are strictly isolated to map instances where the responding Doctor is exactly within their chosen dynamic geofence, preserving real-world transit realism.
-- **Targeted Rescue Mode:** Doctors can triage patients. By accepting to assist a specific patient from their targeting UI, the system engages *only* that patient. It displays a live decreasing Approach Distance (`e.g., Tracking: 240 m`) for the Doctor, while broadcasting a private `A Doctor is on the way!` slide-up banner to the Patient.
-- **Automated Rescue Logging & SOS Disengagement:** When a responding doctor physically enters within a 40-meter radius of the actively tracking patient, system intelligence automatically disengages the SOS state on both devices, cleans up heavy map markers, and securely drops a persistent detailed receipt of the encounter into the newly engineered 10-star secure rating History log.
-- **Dynamic Emergency Density Network:** When a Patient's SOS is inactive, the tracking module securely listens to an anonymous backend heartbeat pinging calculating regional density. It renders an awareness banner (e.g. `You are currently in the rescue zone of 3 doctors...`) directly onto the Patient dashboard assuring coverage safely without ever exposing precise Responder coordinates.
-
-### 🗺️ Real-Time Navigation Assist (OSRM & Nominatim)
-- **Live Routing:** When Responders activate the navigation module, the app maps a highly visible Google-Maps style blue trajectory tracing the fastest road route directly to their targeted patient utilizing the robust Project OSRM API.
-- **Smart Clinic Locator:** If a Patient initiates an SOS but no doctors are nearby, the app dynamically queries OpenStreetMap via the advanced Overpass API for verified medical clinics within a 20-kilometer radius. Found elements are then rapidly parsed through the OSRM Driving Distance API, sorting and feeding the top 3 nearest medical centers by true driving road-distance back to the Patient below the load screen.
-- **Dynamic Compass Pin:** Replaces standard static avatars with dynamic heading-rotation arrow icons, correctly orientating identically to the Responder's real-world physical bearing.
-- **Map Context Switching:** 
-  - *Mini-Map Mode* projects a clean Heads-Up Display showing just the `Time to Arrive (ETA)` pill and instantly Reverse-Geocodes the target's nearest regional Landmark beneath the canvas. 
-  - *Fullscreen Mode* deploys a collapsible, detailed turn-by-turn navigation pane alerting responders to precise distance-to-intersection metrics and upcoming road maneuvers.
-- **Memory Conservation Cache:** Actively pauses and destructs heavy location-routing DOM elements 30 seconds after navigation is toggled off, cleanly resolving memory pollution on lower-end devices while preserving states through accidental double-taps.
-### 🔒 AES-256-CBC End-to-End Encryption (E2EE) & Network Shielding
-- **Private Medical Communications:** MedEm secures all real-time messaging between victims and responders utilizing a deeply-integrated polymorphic drop-in of the native **NodeJS `crypto` module** safely executing over Vite polyfills across the WebSocket layer. Messages are cryptographically converted into unreadable AES-256-CBC ciphertext securely within the device memory before they even hit the server, ensuring rapid encryption avoiding restrictive browser `window.crypto` contexts. The backend operates identically as a blind relay.
-- **Anti-Spoofing & WebSocket Hardening:** The live Socket server is locked down utilizing origin `cors` protection mechanisms masking out any unrecognized requests. Real-time data routing prevents bad actors from sweeping broad latitude/longitude data. Patients only natively broadcast emergency coordinates to verified local Doctors, and Doctors exclusively stream location only to the specific patient they are rescuing.
-
-### 🌐 Tripartite Elastic Map Elements & Responsive Architecture
-- **Mobile Real-Estate Constraints:** The live Map transitions seamlessly through three states (*Collapsed*, *Mini-Modal*, and *Fullscreen*). It features newly rebuilt layout logic mapping independent Dark Mode/Light Mode toggles directly to CartoDB vector endpoints, minimizing visual strain in nighttime environments.
-- **Dynamic Canvases:** The dashboard headers operate on highly responsive flex-driven sticky canvases that seamlessly overlapping under main elements instead of rigid hardcoding, automatically stretching correctly for any future "announcements/alerts" without breaking UI scale or causing z-index component freezing.
-- **Aggressive Code-Splitting optimization:** Features massive bundle size minimizations using `React.lazy` and strict `<Suspense>` boundaries. Visitors do not load massive chunk-heavy interactive maps, history logs, or AI verification routes until explicitly invoked, securing lightning-cast initial TTFB (Time To First Byte).
-
-### ⚡ Technology Stack
-- **Frontend Framework:** React 19 + TypeScript (Powered by Vite)
-- **Aesthetic System:** Tailwind CSS v4 + Framer Motion + Lucide-React SVGs
-- **Live Connection Layer:** Socket.IO / WebSockets (Client & Server)
-- **Security:** Native Web Crypto API (AES-256-CBC) + Rate Limiting & Auth Tokens
-- **Cartography Engine:** React-Leaflet + Leaflet.js
-- **Backend Infrastructure:** Express server running dynamically on Node.js
+### 🚑 For Responders (Save Lives)
+- **Real-Time Alerts:** Receive instant pop-up notifications the moment a patient nearby triggers an SOS.
+- **Live Navigation:** Lock onto a patient's signal and follow the dynamic routing arrow to their exact coordinates with live distance-tracking.
+- **Custom Response Radius:** Choose how far you are willing to travel (`500m`, `1km`, or `2km`) so you only receive alerts you can realistically respond to.
 
 ---
 
-## 📱 Progressive Web App (PWA) Installation Guide
+## 📱 How to Install the App (PWA)
 
-MedEm is designed as a fully responsive, mobile-first web ecosystem. For the absolute best, fullscreen native-app experience without browser URL bars taking up screen space, users should install the app directly to their home screens using Google Chrome.
+MedEm is a Progressive Web App (PWA). This means you don't need to download it from an app store. You can install it directly from your web browser to your phone's home screen for a fast, native app experience!
 
-### Android Installation (via Google Chrome)
-1. Open the live MedEm HTTPS URL in **Google Chrome** on your Android device.
+### Android (Google Chrome)
+1. Open the MedEm website in **Google Chrome**.
 2. Tap the **Three Dots (⋮)** menu icon in the top right corner.
 3. Select **"Add to Home screen"** or **"Install app"**.
-4. Confirm the installation. MedEm will now appear in your app drawer and launch fluidly in fullscreen mode.
+4. Confirm the installation. MedEm will now appear on your home screen!
 
-### iOS Installation (via Safari or Chrome)
-1. Open the live MedEm HTTPS URL in **Safari** (or Chrome) on your iPhone/iPad.
-2. Tap the **Share** icon (the square with an arrow pointing up) at the bottom center of the screen.
-3. Scroll down and tap **"Add to Home Screen"** (you may need to swipe up slightly to see it).
-4. Tap **Add** in the top right corner. The MedEm icon will now sit alongside your native iOS apps.
+### iOS (Safari or Chrome)
+1. Open the MedEm website in **Safari** (or Chrome) on your iPhone/iPad.
+2. Tap the **Share** icon (the square with an arrow pointing up) at the bottom center.
+3. Scroll down and tap **"Add to Home Screen"**.
+4. Tap **Add** in the top right corner.
 
-> [!TIP]
-> Launching MedEm via the Home Screen shortcut guarantees maximum screen real estate for the tracking map and guarantees smoother background geolocation API transitions on mobile devices.
+---
+
+## 🤖 AI Customization (For Advanced Users)
+
+MedEm features an upcoming AI Assistant to help summarize medical records. If you are testing this feature during our Demo Mode, you can securely plug in your own Private AI key in your Account Settings. Your key never leaves your device!
+
+Get your free API keys here:
+*  **[Google Gemini (Recommended & Free)](https://aistudio.google.com/app/apikey)**
+*  **[OpenAI (ChatGPT)](https://platform.openai.com/api-keys)**
+*  **[Anthropic (Claude)](https://console.anthropic.com/)**
 
 ---
 
 ## 🛠️ For Developers & Contributors
 
-Are you an open-source contributor, developer, or systems architect looking to deploy MedEm locally, evaluate the networking constraints, or contribute to upcoming architectural Roadmaps (Auth, AI Inference, Database scaling)? 
+Are you a software engineer looking to deploy MedEm locally, understand the system architecture, or contribute code to the repository? 
 
 👉 **[Read the comprehensive Developer Documentation (DEV-README.md)](./DEV-README.md)**
 
 ---
 
-## 🤖 AI Assist API Keys (Phase 3)
+## 🤝 Support & Contact
 
-MedEm's upcoming Phase 3 AI Inference Engine utilizes a 2-stage roll-out architecture. To use the **MVP / Demo Mode**, you can securely supply your own LLM API Key in the Patient Account Settings. Your key is stored securely in your local browser storage and is never sent to our servers.
-
-To generate your own API key to use with the MedEm AI Assistant, click on the respective provider below:
-*  **[Google Gemini (Recommended & Free Tier)](https://aistudio.google.com/app/apikey)**
-*  **[Anthropic Claude](https://console.anthropic.com/)**
-*  **[OpenAI](https://platform.openai.com/api-keys)**
-
----
-
-## 🤝 Contributing & Contact
-
-I actively welcome open-source developers to contribute to this project! If you find MedEm's core mission compelling, feel free to submit Pull Requests, or open Issues for new feature suggestions or bug fixes. Let's build a better, faster, and more robust emergency tracking platform together!
-
-### 💖 Support the Project
-If you find this open-source prototype valuable and would like to fund its continued scaling, infrastructure, and server development, please reach out directly to the developer using the contact links below.
+I actively welcome open-source developers to contribute! If you find MedEm's core mission compelling, feel free to submit Pull Requests or open Issues on GitHub. Let's build a faster, more robust emergency tracking platform together!
 
 Connect with me using the links below:
 

@@ -10,16 +10,31 @@ export const AboutMedEm = () => (
             <p className="text-sm font-medium text-slate-500 mt-1">Version 1.0.0</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Your Lifeline in Emergencies</h4>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                MedEm is a high-performance, real-time emergency tracking application leveraging precise geolocation to instantly connect you with nearby medical responders through an interactive live map.
-            </p>
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+            <div>
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Your Lifeline in Emergencies</h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    MedEm is a high-performance, real-time emergency tracking application leveraging precise geolocation to instantly connect you with nearby medical responders.
+                </p>
+            </div>
+            
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                <h5 className="font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                    <span className="bg-med text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">?</span>
+                    How to use MedEm
+                </h5>
+                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-2 list-disc pl-5">
+                    <li><strong className="text-slate-700 dark:text-slate-300">Send an SOS:</strong> Tap the red emergency button on your home screen to instantly broadcast an SOS to all nearby active doctors.</li>
+                    <li><strong className="text-slate-700 dark:text-slate-300">Stay Connected:</strong> Once a responder accepts, our live map streams your precise location exclusively to them.</li>
+                    <li><strong className="text-slate-700 dark:text-slate-300">Communicate:</strong> Use the secure chat to exchange vital details with your incoming responder.</li>
+                </ul>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50 mt-4">
                 <h5 className="text-blue-800 dark:text-blue-300 font-bold mb-1">Coming Soon (Phase 2 & 3)</h5>
                 <ul className="text-xs text-blue-700/80 dark:text-blue-300/80 list-disc pl-4 space-y-1">
-                    <li>Google and Direct Email Authentication.</li>
-                    <li>AI-Summarized Medical Profiles for emergency personnel.</li>
+                    <li>Secure authentication (Google & Email).</li>
+                    <li>AI-summarized past medical records for emergency responders.</li>
                 </ul>
             </div>
         </div>

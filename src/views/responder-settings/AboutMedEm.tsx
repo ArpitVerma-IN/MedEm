@@ -10,16 +10,31 @@ export const AboutMedEm = () => (
             <p className="text-sm font-medium text-slate-500 mt-1">Responder Edition - v1.0.0</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
-            <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Empowering Real-Time Rescues</h4>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
-                MedEm functions as a high-frequency tracking network specifically designed for verified medical professionals to intercept emergency SOS beacons in their direct vicinity.
-            </p>
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50">
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
+            <div>
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Empowering Real-Time Rescues</h4>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    MedEm functions as a high-frequency tracking network specifically designed for medical professionals to intercept emergency SOS beacons in their vicinity.
+                </p>
+            </div>
+            
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                <h5 className="font-bold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-2">
+                    <span className="bg-success text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">?</span>
+                    How to use MedEm First Response
+                </h5>
+                <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-2 list-disc pl-5">
+                    <li><strong className="text-slate-700 dark:text-slate-300">Stay Alert:</strong> Keep the "Accepting Help" toggle ON to remain visible as an active responder in your area.</li>
+                    <li><strong className="text-slate-700 dark:text-slate-300">Accept Beacons:</strong> If a patient broadcasts an SOS nearby, an alert automatically pops up. Click "Accept" to engage the rescue.</li>
+                    <li><strong className="text-slate-700 dark:text-slate-300">Target Reached:</strong> Follow the dynamic routing arrow to the patient, and tap the "Target Reached" checkmark once the rescue is completed.</li>
+                </ul>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50 mt-4">
                 <h5 className="text-blue-800 dark:text-blue-300 font-bold mb-1">Coming Soon (Phase 2 & 3)</h5>
                 <ul className="text-xs text-blue-700/80 dark:text-blue-300/80 list-disc pl-4 space-y-1">
-                    <li>AI Vision-based verification of your uploaded medical credentials.</li>
-                    <li>Live AI-Summaries of patient history generated the moment you accept an SOS.</li>
+                    <li>AI Vision-based verification of uploaded medical credentials.</li>
+                    <li>Live AI-Summaries of patient history retrieved automatically upon engaging an SOS.</li>
                 </ul>
             </div>
         </div>
