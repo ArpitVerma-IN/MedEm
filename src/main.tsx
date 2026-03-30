@@ -3,6 +3,8 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import { registerSW } from 'virtual:pwa-register'
+import { ErrorBoundary } from './core/error/ErrorBoundary.tsx'
+import { AuthProvider } from './core/auth/AuthContext.tsx'
 
 // Aggressive cache management: Automatically update service worker on new builds
 const updateSW = registerSW({
@@ -18,6 +20,10 @@ const updateSW = registerSW({
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )

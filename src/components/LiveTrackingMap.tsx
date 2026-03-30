@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet';
 import L from 'leaflet';
@@ -98,7 +98,7 @@ interface LiveTrackingMapProps {
     onTargetReached?: (target: User, address: string | null) => void;
 }
 
-export const LiveTrackingMap = ({
+export const LiveTrackingMap = React.memo(({
     myLocation,
     name,
     userType,
@@ -528,4 +528,4 @@ export const LiveTrackingMap = ({
             )}
         </div>
     );
-};
+});

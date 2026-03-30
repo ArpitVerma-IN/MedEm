@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useLiveTracker } from '../hooks/useLiveTracker';
 import { BottomNav } from '../components/BottomNav';
 import type { TabType } from '../components/BottomNav';
+import { ErrorBoundary } from '../core/error/ErrorBoundary';
 
 // Views
 import { DoctorHomeView } from '../views/DoctorHomeView';
@@ -121,16 +122,20 @@ export const DoctorDashboard = () => {
                     )}
                     {activeTab === 'history' && (
                         <motion.div key="history" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
-                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
-                                <DoctorHistoryView />
-                            </Suspense>
+                            <ErrorBoundary>
+                                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
+                                    <DoctorHistoryView />
+                                </Suspense>
+                            </ErrorBoundary>
                         </motion.div>
                     )}
                     {activeTab === 'profile' && (
                         <motion.div key="profile" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
-                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
-                                <DoctorProfileView name={name} />
-                            </Suspense>
+                            <ErrorBoundary>
+                                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-emerald-600 animate-spin"></div></div>}>
+                                    <DoctorProfileView name={name} />
+                                </Suspense>
+                            </ErrorBoundary>
                         </motion.div>
                     )}
                 </AnimatePresence>

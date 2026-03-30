@@ -24,8 +24,9 @@ MedEm is an advanced minimum viable prototype designed to evaluate live-tracking
 - **Hardened Origin Configurations:** The live Socket server is locked down utilizing origin `cors` protection mechanisms masking out unrecognized headers. Real-time data routing prevents bad actors from sweeping broad latitude/longitude data.
 
 ### 4. Progressive Dashboard & Offline Capabilities
-- **Modular Code-Splitting:** Features massive JavaScript bundle minimizations using `React.lazy` and strict `<Suspense>` boundaries. Heavy interactive maps, 3rd party SDKs, and history logs are decoupled from the main thread and lazy-loaded only when explicitly invoked, enabling lightning-fast initial TTFB (Time To First Byte).
-- **Workbox Service Workers:** Custom `vite-plugin-pwa` configurations generate Google Workbox deployment agents that aggressively cache the application shell and React bundles inside the browser's hidden storage. This ensures the app UI instantly boots completely offline, bypassing cellular network latency entirely.
+- **Modular Code-Splitting & Granular Fault Tolerance:** Features massive JavaScript bundle minimizations using `React.lazy` and localized `<Suspense>` boundaries wrapped meticulously inside rigid `<ErrorBoundary>` structures. Heavy interactive maps and history logs are decoupled from the main thread. If a chunk dynamically fails to load due to mobile connectivity drops, the rest of the application interface survives elegantly without crashing the root DOM tree.
+- **Aggressive Memoization:** Highly reactive Cartographic DOM nodes (e.g., `LiveTrackingMap`) are rigorously wrapped in `React.memo()`, preventing hundreds of unneeded coordinate diffs whenever outer navigation layout components update.
+- **Workbox Service Workers:** Custom `vite-plugin-pwa` configurations generate Google Workbox deployment agents that aggressively cache the application shell and React bundles inside the browser's hidden storage. This ensures the app UI instantly boots completely offline.
 
 ---
 

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useLiveTracker } from '../hooks/useLiveTracker';
 import { BottomNav } from '../components/BottomNav';
 import type { TabType } from '../components/BottomNav';
+import { ErrorBoundary } from '../core/error/ErrorBoundary';
 
 // Views
 import { PatientHomeView } from '../views/PatientHomeView';
@@ -107,23 +108,29 @@ export const PatientDashboard = () => {
                     )}
                     {activeTab === 'ai' && (
                         <motion.div key="ai" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
-                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
-                                <AIAssistView />
-                            </Suspense>
+                            <ErrorBoundary>
+                                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
+                                    <AIAssistView />
+                                </Suspense>
+                            </ErrorBoundary>
                         </motion.div>
                     )}
                     {activeTab === 'history' && (
                         <motion.div key="history" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
-                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
-                                <HistoryView sendRating={sendRating} />
-                            </Suspense>
+                            <ErrorBoundary>
+                                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
+                                    <HistoryView sendRating={sendRating} />
+                                </Suspense>
+                            </ErrorBoundary>
                         </motion.div>
                     )}
                     {activeTab === 'profile' && (
                         <motion.div key="profile" className="flex-1 flex flex-col h-full w-full" exit={{ opacity: 0, transition: { duration: 0.1 } }}>
-                            <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
-                                <ProfileView name={name} />
-                            </Suspense>
+                            <ErrorBoundary>
+                                <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 rounded-full border-4 border-slate-200 border-t-med animate-spin"></div></div>}>
+                                    <ProfileView name={name} />
+                                </Suspense>
+                            </ErrorBoundary>
                         </motion.div>
                     )}
                 </AnimatePresence>
