@@ -31,3 +31,24 @@ export interface HistoryEvent {
     userType: 'Doctor' | 'Patient';
     rating: number | null;
 }
+
+// ----------------------------------------------------
+// Phase 2 Database & Authentication Schemas
+// ----------------------------------------------------
+
+export interface DatabaseProfile {
+    profile_id: string; // Relational Primary Key (mapped to Auth Provider UUID)
+    created_at: string;
+    email: string;
+    full_name: string;
+    role: 'Doctor' | 'Patient';
+    medical_license_number?: string; // For Doctor verification check
+    is_verified: boolean;
+}
+
+export interface AuthSession {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+    profile: DatabaseProfile;
+}

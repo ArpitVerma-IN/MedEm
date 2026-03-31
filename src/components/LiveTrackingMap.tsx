@@ -5,6 +5,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Maximize2, Minimize2, X, Locate, Moon, Sun, Navigation, NavigationOff, MapPin, List, CornerDownLeft, CornerDownRight, ArrowUp, RotateCw } from 'lucide-react';
 import type { User, Location as UserLocation } from '../types';
+import { apiClient } from '../core/api/apiClient';
 
 // Create a custom hook to center the map on a location with a slight debounce
 const MapController = ({ center }: { center: [number, number] | null }) => {
@@ -199,8 +200,7 @@ export const LiveTrackingMap = React.memo(({
         let active = true;
         const fetchAddress = async () => {
              try {
-                 const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${targetLoc.lat}&lon=${targetLoc.lng}&zoom=18&addressdetails=1`);
-                 const data = await res.json();
+                 const data = await apiClient<any>(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${targetLoc.lat}&lon=${targetLoc.lng}&zoom=18&addressdetails=1`);
                  if (active && data?.display_name) {
                      const name = data.name || data.address?.road || data.display_name.split(',')[0];
                      setNavAddress(name);
@@ -232,8 +232,7 @@ export const LiveTrackingMap = React.memo(({
               const trgL = latestTargetLoc.current;
               if (!myL || !trgL) return;
               try {
-                  const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${myL.lng},${myL.lat};${trgL.lng},${trgL.lat}?overview=full&geometries=geojson&steps=true`);
-                  const data = await res.json();
+                  const data = await apiClient<any>(`https://router.project-osrm.org/route/v1/driving/${myL.lng},${myL.lat};${trgL.lng},${trgL.lat}?overview=full&geometries=geojson&steps=true`);
                   if (active && data.routes && data.routes.length > 0) {
                       const route = data.routes[0];
                       const coords = route.geometry.coordinates.map((c: any) => [c[1], c[0]]);
