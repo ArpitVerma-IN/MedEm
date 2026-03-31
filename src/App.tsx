@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { useTheme } from './hooks/useTheme';
+import { ProtectedRoute } from './core/auth/ProtectedRoute';
 
 // Code-Splitting: Load larger phase files dynamically instead of initial bundling
 const LandingPage = lazy(() => import('./pages/LandingPage').then(module => ({ default: module.LandingPage })));
@@ -24,8 +25,16 @@ function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/patient" element={<PatientDashboard />} />
-          <Route path="/doctor" element={<DoctorDashboard />} />
+          <Route path="/patient" element={
+            <ProtectedRoute requireRole="Patient">
+              <PatientDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/doctor" element={
+            <ProtectedRoute requireRole="Doctor">
+              <DoctorDashboard />
+            </ProtectedRoute>
+          } />
         </Routes>
       </Suspense>
     </Router>
