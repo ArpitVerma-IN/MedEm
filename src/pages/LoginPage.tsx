@@ -87,7 +87,7 @@ export const LoginPage = () => {
                     <div className="flex flex-col gap-1.5">
                         <div className="flex justify-between items-end ml-1 mr-1">
                             <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Password</label>
-                            <Link to="#" className="text-xs font-bold text-med hover:text-med-dark transition-colors">Forgot Password?</Link>
+                            <Link to="/forgot-password" className="text-xs font-bold text-med hover:text-med-dark transition-colors">Forgot Password?</Link>
                         </div>
                         <input
                             type="password"

@@ -98,13 +98,14 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
 - **Tech Stack:** 
   [![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](#) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#) [![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)](#)
 
-### Phase 2: Authentication & Secure Infrastructure
+### Phase 2: Authentication & Secure Infrastructure [ACTIVE]
 **Focus:** Implementing a robust, secure data foundation and user login system.
-- **Secure Login:** Integration of secure login for doctors and patients using either native credentials (ID/Password) or secure OAuth providers (Google, etc.).
-- **Dual-Database Architecture:** Segregation of data. Utilize a dedicated authentication provider for login credentials, and a separate, secure, free NoSQL/SQL database for storing private user app data (ensuring strict data safety mimicking Render/Netlify's ease of deployment).
-- **Security-First:** Embed secure design philosophies (e.g., JWT rotation, strict CORS, rate limiting) directly into the API architecture.
+- **[Live] Secure Email Architecture:** Explicit Supabase-driven email authentication interfaces (`LoginPage`, `SignupPage`, `ResetPassword`) structurally routing and managing session lifecycles natively.
+- **[Live] Dual-Database Architecture:** Segregation of data completely utilizing `supabaseClient` and relational `public.profiles` schemas mapping verified users logically away from the public Node WSS relay.
+- **Security-First:** Embedded secure design philosophies seamlessly capturing explicit role states (`Patient` / `Doctor`) within isolated Context boundaries.
+- **Next Up:** OAuth integration (Google Provider).
 - **Tech Stack:** 
-  [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](#) [![Google OAuth](https://img.shields.io/badge/Google_OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white)](#) [![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](#)
+  [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](#) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#)
 
 ### Phase 3: AI Verification & Medical Records Management
 **Focus:** Elevating trust, safety, and operational efficiency using artificial intelligence.
@@ -122,7 +123,7 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
   [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](#) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#) 
 
 > [!NOTE]
-> **To accelerate Phase 2 & 3 integrations**, dynamic uninitialized boilerplate architectures (`src/context/AuthContext.tsx`, `src/services/db.ts`, and `src/services/ai.ts`) have been added to the master branch. These contain foundational structural mapping necessary for scaling data services and authentication cleanly in the upcoming cycles without rewriting the DOM. 
+> **Active Integrations Tracking:** Dynamic uninitialized boilerplate architectures (`src/core/auth/AuthContext.tsx`, `src/core/api/supabaseClient.ts`, and core security boundaries) were fully activated in the latest release. Next iterations will target scaling `src/services/ai.ts` cleanly. 
 
 ---
 

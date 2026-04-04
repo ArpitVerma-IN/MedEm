@@ -7,6 +7,8 @@ import { ProtectedRoute } from './core/auth/ProtectedRoute';
 const LandingPage = lazy(() => import('./pages/LandingPage').then(module => ({ default: module.LandingPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
 const SignupPage = lazy(() => import('./pages/SignupPage').then(module => ({ default: module.SignupPage })));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(module => ({ default: module.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(module => ({ default: module.ResetPasswordPage })));
 const PatientDashboard = lazy(() => import('./pages/PatientDashboard').then(module => ({ default: module.PatientDashboard })));
 const DoctorDashboard = lazy(() => import('./pages/DoctorDashboard').then(module => ({ default: module.DoctorDashboard })));
 
@@ -29,6 +31,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/patient" element={
             <ProtectedRoute requireRole="Patient">
               <PatientDashboard />

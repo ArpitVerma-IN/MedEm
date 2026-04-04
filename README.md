@@ -35,6 +35,10 @@ Using fast, modern web technologies, MedEm creates a seamless and secure connect
 
 ## ✨ Key Features
 
+### 🔒 Core Security (Phase 2)
+- **Supabase Identity Verification:** Choose between entering immediately as an anonymous guest or registering a robust, verifiable emergency profile locked behind Supabase Email Authentication.
+- **Secure Session Recovery:** Full-scale password reset and lifecycle routing protects your data locally and remotely.
+
 ### 🆘 For Patients (Send an SOS)
 - **One-Tap Emergency Alert:** Simply press the big red SOS button to instantly alert all verified medical professionals near your location.
 - **Smart Clinic Locator:** If no responders are nearby, the app automatically finds and routes you to the Top 3 nearest hospitals or medical clinics.
