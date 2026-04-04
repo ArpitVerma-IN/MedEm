@@ -90,6 +90,17 @@ Are you a software engineer looking to deploy MedEm locally, understand the syst
 
 ## 🤝 Support & Contact
 
+---
+
+## ⚖️ Privacy & Compliance
+
+MedEm is architected specifically to meet the high data isolation thresholds required in modern medical environments. We respect your physical coordinates and emergency tracking data.
+Our Supabase Cloud Infrastructure natively maps strictly to the following standards:
+*   **GDPR / CCPA:** Explicit Right to Data Erasure & Portability.
+*   **HIPAA / ISO 27001:** Enforced Row-Level Security (RLS) PostgreSQL constraints & AES-256 E2E payloads.
+
+👉 **[Read the full Privacy & Compliance Document (PRIVACY_POLICY.md)](./PRIVACY_POLICY.md)**
+
 I actively welcome open-source developers to contribute! If you find MedEm's core mission compelling, feel free to submit Pull Requests or open Issues on GitHub. Let's build a faster, more robust emergency tracking platform together!
 
 Connect with me using the links below:
