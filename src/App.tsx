@@ -5,6 +5,8 @@ import { ProtectedRoute } from './core/auth/ProtectedRoute';
 
 // Code-Splitting: Load larger phase files dynamically instead of initial bundling
 const LandingPage = lazy(() => import('./pages/LandingPage').then(module => ({ default: module.LandingPage })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
+const SignupPage = lazy(() => import('./pages/SignupPage').then(module => ({ default: module.SignupPage })));
 const PatientDashboard = lazy(() => import('./pages/PatientDashboard').then(module => ({ default: module.PatientDashboard })));
 const DoctorDashboard = lazy(() => import('./pages/DoctorDashboard').then(module => ({ default: module.DoctorDashboard })));
 
@@ -25,6 +27,8 @@ function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/patient" element={
             <ProtectedRoute requireRole="Patient">
               <PatientDashboard />

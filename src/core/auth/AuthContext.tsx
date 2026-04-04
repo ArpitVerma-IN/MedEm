@@ -1,20 +1,17 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { User } from '../../types';
-
-// Phase 2: Authentication Context Boilerplate
-// This file will handle the state for logged-in users, tokens, and OAuth flows (e.g., Supabase, Firebase).
+import type { User, DatabaseProfile } from '../../types';
+import { supabase } from '../api/supabaseClient';
 
 interface AuthState {
     user: User | null;
+    profile: DatabaseProfile | null;
     isAuthenticated: boolean;
     isLoading: boolean;
 }
 
 interface AuthContextType extends AuthState {
-    login: (credentials: Record<string, string>) => Promise<void>;
     logout: () => Promise<void>;
-    register: (details: Record<string, string>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,30 +19,89 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [state, setState] = useState<AuthState>({
         user: null,
+        profile: null,
         isAuthenticated: false,
-        isLoading: false,
+        isLoading: true,
     });
 
-    // TODO: Implement actual authentication logic here in Phase 2
-    const login = async (credentials: Record<string, string>) => {
-        // Implement login (Supabase auth.signInWithPassword etc.)
-        // Ensure default `isActiveResponder` and `needsCare` states are retrieved and set properly here.
-        setState(prev => ({ ...prev, isLoading: true }));
-        console.log("Login not yet implemented", credentials);
-    };
+    useEffect(() => {
+        // Fetch current session natively from Workbox / Local Storage via Supabase SDK
+        const initializeAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session?.user) {
+                // Fetch strict Profile bounds metadata
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('profile_id', session.user.id)
+                    .single();
+
+                if (profileData) {
+                    setState({
+                        profile: profileData,
+                        user: {
+                            id: session.user.id,
+                            name: profileData.full_name,
+                            location: { lat: 0, lng: 0 }, 
+                            color: '#3B82F6', 
+                            userType: profileData.role,
+                            needsCare: false,
+                        },
+                        isAuthenticated: true,
+                        isLoading: false
+                    });
+                } else {
+                    setState(p => ({ ...p, isAuthenticated: false, isLoading: false }));
+                }
+            } else {
+                setState(p => ({ ...p, isAuthenticated: false, isLoading: false }));
+            }
+        };
+
+        initializeAuth();
+
+        // Subscribe to Token refreshes, Login, and Logout events globally
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('profile_id', session.user.id)
+                    .single();
+
+                if (profileData) {
+                    setState({
+                        profile: profileData,
+                        user: {
+                            id: session.user.id,
+                            name: profileData.full_name,
+                            location: { lat: 0, lng: 0 },
+                            color: '#3B82F6',
+                            userType: profileData.role,
+                            needsCare: false,
+                        },
+                        isAuthenticated: true,
+                        isLoading: false
+                    });
+                }
+            } else if (event === 'SIGNED_OUT') {
+                setState({ user: null, profile: null, isAuthenticated: false, isLoading: false });
+                localStorage.removeItem('medem_auth_token');
+            }
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
 
     const logout = async () => {
-        // Implement logout
-        console.log("Logout not yet implemented");
-    };
-
-    const register = async (details: Record<string, string>) => {
-        // Implement registration
-        console.log("Register not yet implemented", details);
+        await supabase.auth.signOut();
     };
 
     return (
-        <AuthContext.Provider value={{ ...state, login, logout, register }}>
+        <AuthContext.Provider value={{ ...state, logout }}>
             {children}
         </AuthContext.Provider>
     );
