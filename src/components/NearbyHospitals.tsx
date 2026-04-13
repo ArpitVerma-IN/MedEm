@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Building2, X, ChevronRight, MapPin } from 'lucide-react';
+import { Building2, X, ChevronRight, MapPin, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Location } from '../types';
 
@@ -130,6 +130,12 @@ export const NearbyHospitals = ({
         setHasFetched(false);
     };
 
+    const handleReload = () => {
+        if (!loading) {
+            setHasFetched(false);
+        }
+    };
+
     const detailsView = (
         <div className="flex flex-col gap-3 w-full animate-in fade-in zoom-in-95 pointer-events-auto">
             <h3 className="text-[0.95rem] font-bold text-slate-800 dark:text-slate-100 flex items-center justify-between">
@@ -138,9 +144,16 @@ export const NearbyHospitals = ({
                     Nearest Medical Centers
                 </span>
                 {mode !== 'connecting' && (
-                    <button onClick={handleClose} className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
-                        <X size={16} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        {!loading && (
+                            <button onClick={handleReload} title="Reload nearby centers" className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full text-slate-500 hover:text-blue-500 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-900/20 transition-colors">
+                                <RefreshCw size={16} />
+                            </button>
+                        )}
+                        <button onClick={handleClose} title="Close" className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                            <X size={16} />
+                        </button>
+                    </div>
                 )}
             </h3>
             
