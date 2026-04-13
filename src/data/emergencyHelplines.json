@@ -1,0 +1,43 @@
+{
+  "in": {
+    "default": [
+      { "service": "National Emergency Number", "number": "112" },
+      { "service": "Ambulance", "number": "102" },
+      { "service": "Police", "number": "100" }
+    ],
+    "states": {
+      "maharashtra": [
+        { "service": "State EMS", "number": "108" }
+      ],
+      "assam": [
+        { "service": "River/Boat Ambulance", "number": "108" }
+      ],
+      "kerala": [
+        { "service": "Pink Patrol (Women's Safety)", "number": "1515" }
+      ],
+      "delhi": [
+        { "service": "Delhi Women Emergency", "number": "181" },
+        { "service": "CATS Ambulance", "number": "102" }
+      ]
+    }
+  },
+  "us": {
+    "default": [
+      { "service": "Emergency (All Services)", "number": "911" }
+    ],
+    "states": {}
+  },
+  "gb": {
+    "default": [
+      { "service": "Emergency", "number": "999" },
+      { "service": "Non-Emergency Medical", "number": "111" }
+    ],
+    "states": {}
+  },
+  "au": {
+    "default": [
+      { "service": "Emergency", "number": "000" }
+    ],
+    "states": {}
+  }
+}

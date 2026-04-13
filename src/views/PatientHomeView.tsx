@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { LiveTrackingMap } from '../components/LiveTrackingMap';
 import { NearbyHospitals } from '../components/NearbyHospitals';
+import { LocalHelplines } from '../components/LocalHelplines';
 import clsx from 'clsx';
 import type { User, Location as UserLocation, ChatMessage } from '../types';
 
@@ -345,6 +346,7 @@ export const PatientHomeView = ({
                                             </div>
                                         </div>
                                         <NearbyHospitals location={myLocation} mode="standby" />
+                                        <LocalHelplines location={myLocation} mode="standby" />
                                     </motion.div>
                                 )}
                             </motion.div>
@@ -362,6 +364,7 @@ export const PatientHomeView = ({
                                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Connecting to Responder</h3>
                                 <p className="text-gray-500 dark:text-gray-400 font-medium">Please wait a moment while we dispatch your exact coordinates to the nearest verified medical professional...</p>
                                 <NearbyHospitals location={myLocation} mode="connecting" />
+                                <LocalHelplines location={myLocation} mode="connecting" />
                             </motion.div>
                         )}
 
