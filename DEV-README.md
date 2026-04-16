@@ -122,6 +122,14 @@ To evolve this prototype into a full-fledged, production-ready healthcare applic
 - **Tech Stack:** 
   [![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](#) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](#) 
 
+### Phase 5: Native Mobile Framework Integration
+**Focus:** Wrapping the web client architecture explicitly into true Android (.apk) and iOS (.ipa) compiled Native environments to bypass severe PWA limitations on mobile devices.
+- **Persistent Location Tracking:** Decouple GPS arrays from web limitations utilizing the Foreground Service API, guaranteeing physical SOS background pings ignoring OS battery optimizations entirely.
+- **Hardware Push Notifications:** Fire off strict FCM Push Notifications (bypassing suspended WebSockets) securely relaying Respondent exact live distances while the client is locked.
+- **Quick Action Bar:** Maintain a pinned SOS Sticky notification drawer directly on the OS bar ensuring victims can cancel/override critical states seamlessly outside the DOM.
+- **Tech Stack:** 
+  [![Ionic Capacitor](https://img.shields.io/badge/Capacitor-118EEA?style=for-the-badge&logo=capacitor&logoColor=white)](#) [![Android Studio](https://img.shields.io/badge/Android_Studio-3DDC84?style=for-the-badge&logo=android-studio&logoColor=white)](#) [![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](#) 
+
 > [!NOTE]
 > **Active Integrations Tracking:** Dynamic uninitialized boilerplate architectures (`src/core/auth/AuthContext.tsx`, `src/core/api/supabaseClient.ts`, and core security boundaries) were fully activated in the latest release. Next iterations will target scaling `src/services/ai.ts` cleanly. 
 

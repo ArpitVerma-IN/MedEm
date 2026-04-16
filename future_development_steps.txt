@@ -1,0 +1,76 @@
+# NATIVE MULTI-PLATFORM MOBILE MIGRATION GUIDE (PHASE 5)
+
+## Objective
+Convert the existing Progressive Web App (PWA) infrastructure into a strictly compiled Native Application (`.apk` and `.ipa`) using Ionic Capacitor. This unlocks critical emergency features blocked by mobile browsers: persistent foreground services, sticky pinned notification bars for Quick SOS access, continuous background Geolocation API tracking without battery optimization drop-offs, and native push payloads.
+
+## Pre-Requisites
+1. Node.js environment.
+2. Android Studio (Windows/Mac) configured with latest Android SDK and Gradle builds.
+3. Xcode (MacOS required) for iOS compilation and Apple Developer certification.
+4. Firebase Cloud Messaging (FCM) account for provisioning native Push Notification certificates.
+
+## Implementation Steps
+
+### 1. Capacitor Initialization
+Run the initialization sequence to embed Capacitor into the standard Vite deployment pipeline.
+```bash
+npm install @capacitor/core @capacitor/cli
+npx cap init MedEm org.medem.app --web-dir dist
+npm install @capacitor/android @capacitor/ios
+npx cap add android
+npx cap add ios
+```
+
+### 2. Deep Native API Integration
+Install the required native functionality bindings:
+```bash
+npm install @capacitor/push-notifications @capacitor/geolocation @capacitor-community/background-geolocation @capacitor/app
+```
+
+### 3. Modifying `vite.config.ts`
+Capacitor requires the frontend to compile gracefully into a static web-dir (our `dist` folder). When deploying Native versions, remove standard `VitePWA` routing mechanisms explicitly for the iOS/Android targets, as ServiceWorkers operate fundamentally differently inside Capacitor's WebKit views.
+
+Automate the syncing:
+Modify `package.json` build scripts:
+`"build:native": "tsc -b && vite build && npx cap sync"`
+
+### 4. Background Notification Bar Construction (Android)
+To keep the app alive and running the WebSockets while minimized, implement Android Foreground Services.
+Write native Java/Kotlin bindings inside `android/app/src/main/java/org/medem/app/MainActivity.java` or use the Background Geolocation plugin to trigger an explicit Foreground Notification.
+- Set Notification Channel ID: "emergency_tracking_channel"
+- Priority: `IMPORTANCE_HIGH`
+- Include Native Action Intents inside the notification payload pointing directly back to the WebView bridge (e.g., "Cancel SOS").
+
+### 5. iOS Background Permissions
+Open `/ios/App/App/Info.plist` in Xcode and strictly append:
+- `UIBackgroundModes`: Location, Fetch, Remote-Notification
+- `NSLocationAlwaysAndWhenInUseUsageDescription`: "MedEm requires continuous background location to stream coordinates to responding emergency personnel while your phone is locked."
+- `NSLocationWhenInUseUsageDescription`: "MedEm requires location services to map emergency responders."
+
+### 6. FCM Push Notification Certificates
+Integrate Firebase natively:
+1. Download `google-services.json` from the Firebase Console and place it in the `android/app/` directory.
+2. Download `GoogleService-Info.plist` and inject it directly into the Xcode project (`ios/App/App/`).
+3. Connect the Push Notification listener inside `src/App.tsx`:
+```javascript
+import { PushNotifications } from '@capacitor/push-notifications';
+
+PushNotifications.requestPermissions().then(result => {
+  if (result.receive === 'granted') {
+    PushNotifications.register();
+  }
+});
+
+PushNotifications.addListener('pushNotificationReceived', (notification) => {
+  // Fire Redux/Context state modifier waking the UI
+});
+```
+
+## Compilation Protocols
+- You can no longer push the Native `.apk/.ipa` directly via Netlify standard branching.
+- The web equivalent branch continues via standard GitHub CI/CD bounds.
+- Android Native Code requires opening Android Studio, clicking `Build > Generate Signed Bundle / APK`, mapping your keystore variables, and explicitly deploying through the Google Play Developer Console.
+
+## Anticipated Conflicts & Troubleshooting
+- **CORS Blocking on Sockets:** Android WebView operates natively on `http://localhost`. Ensure your Supabase RLS and `Cors` parameters in Node explicitly accept `capacitor://localhost` and `http://localhost`.
+- **UI Clipping (Safe Area Notches):** Introduce CSS environments global vars: `padding-top: env(safe-area-inset-top);` to ensure the layout engine does not render underneath the dynamic island/camera notches.
