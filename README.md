@@ -41,7 +41,7 @@ Using fast, modern web technologies, MedEm creates a seamless and secure connect
 
 ### 🆘 For Patients (Send an SOS)
 - **One-Tap Emergency Alert:** Simply press the big red SOS button to instantly alert all verified medical professionals near your location.
-- **Smart Clinic Locator:** If no responders are nearby, the app automatically finds and routes you to the Top 3 nearest hospitals or medical clinics.
+- **Smart Clinic Locator:** If no responders are nearby, the app automatically finds and routes you to the Top 3 nearest hospitals or medical clinics. Includes manual refresh and fallback to reverse-geocoded local emergency helplines.
 - **Secure Communication:** Once a responder accepts your SOS, you can safely chat and share vital details. All messages are completely encrypted.
 
 ### 🚑 For Responders (Save Lives)
@@ -67,7 +67,7 @@ MedEm is a Progressive Web App (PWA). This means you don't need to download it f
 3. Scroll down and tap **"Add to Home Screen"**.
 4. Tap **Add** in the top right corner.
 
----
+
 
 ## 🤖 AI Customization (For Advanced Users)
 
@@ -88,10 +88,6 @@ Are you a software engineer looking to deploy MedEm locally, understand the syst
 
 ---
 
-## 🤝 Support & Contact
-
----
-
 ## ⚖️ Privacy & Compliance
 
 MedEm is architected specifically to meet the high data isolation thresholds required in modern medical environments. We respect your physical coordinates and emergency tracking data.
@@ -100,6 +96,10 @@ Our Supabase Cloud Infrastructure natively maps strictly to the following standa
 *   **HIPAA / ISO 27001:** Enforced Row-Level Security (RLS) PostgreSQL constraints & AES-256 E2E payloads.
 
 👉 **[Read the full Privacy & Compliance Document (PRIVACY_POLICY.md)](./PRIVACY_POLICY.md)**
+
+---
+
+## 🤝 Support & Contact
 
 I actively welcome open-source developers to contribute! If you find MedEm's core mission compelling, feel free to submit Pull Requests or open Issues on GitHub. Let's build a faster, more robust emergency tracking platform together!
 
