@@ -15,3 +15,29 @@ export const supabase = createClient(
     supabaseUrl || 'https://placeholder.supabase.co',
     supabaseAnonKey || 'placeholder'
 );
+
+/**
+ * Initiates the Google OAuth 2.0 flow via Supabase.
+ * It automatically redirects the user to the Google Consent screen.
+ * Upon success, Supabase catches the redirect and natively writes the JWT token to local storage.
+ */
+export const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            // This tells Supabase to redirect back to the home route after Google confirms their identity
+            redirectTo: window.location.origin,
+            queryParams: {
+                access_type: 'offline', // Requests a refresh token so the user stays logged in
+                prompt: 'consent',
+            }
+        }
+    });
+
+    if (error) {
+        console.error("Google OAuth Error:", error.message);
+        throw error;
+    }
+    
+    return data;
+};
