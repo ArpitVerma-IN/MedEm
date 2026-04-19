@@ -25,6 +25,14 @@
 
 ---
 
+> [!WARNING]
+> **Beta Software & Ongoing Development**
+> MedEm is currently undergoing aggressive Phase 2 structural modifications (including complete overhauls to our authentication pipelines and live WebSocket tracking relays). As a result, you may encounter temporary instability, technical risks, or unexpected login behavior.
+> 
+> 🎯 **Recommendation:** For the most streamlined and stable experience prior to our official full release, we highly recommend bypassing the authentication screens entirely. **Please use Guest Mode** on the landing page to test out the core features without interruption.
+
+---
+
 ## 📖 Overview
 
 **MedEm** is an emergency tracking application designed to save lives by cutting down emergency response times. It instantly connects **Patients** in need with the closest available **Medical Responders** (Doctors/Nurses) on an interactive live map.
